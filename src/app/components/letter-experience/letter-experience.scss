@@ -126,54 +126,6 @@
   .tabbar__item { transition: none; }
 }
 
-/* ----- In-app browser notice ---------------------------------------------- */
-.inapp {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 40;
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  padding-top: calc(var(--space-3) + env(safe-area-inset-top, 0px));
-  background: var(--color-maroon);
-  color: #fff;
-  font-family: var(--font-body);
-  font-size: var(--fs-100);
-  box-shadow: var(--shadow-md);
-
-  &__text { flex: 1 1 auto; line-height: 1.35; }
-
-  &__btn {
-    flex: 0 0 auto;
-    padding: var(--space-2) var(--space-4);
-    border: 0;
-    border-radius: 999px;
-    background: #fff;
-    color: var(--color-maroon);
-    font-family: var(--font-ui);
-    font-size: 0.66rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    font-weight: 600;
-  }
-
-  &__hint { flex: 0 0 auto; opacity: 0.9; font-size: 0.8rem; }
-
-  &__close {
-    flex: 0 0 auto;
-    width: 28px;
-    height: 28px;
-    border: 0;
-    background: transparent;
-    color: #fff;
-    font-size: 1.5rem;
-    line-height: 1;
-  }
-}
-
 .back {
   position: absolute;
   top: clamp(var(--space-4), 3vw, var(--space-8));

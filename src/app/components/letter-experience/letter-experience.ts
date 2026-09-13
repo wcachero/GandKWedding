@@ -31,20 +31,6 @@ const STAGE_ORDER: readonly Stage[] = ['sealed', 'open', 'reading'];
   imports: [SealedEnvelope, OpenEnvelope, WeddingInvitation, SiteFooter, MusicDisc],
   template: `
     <div class="scene" [attr.data-stage]="stage()">
-      @if (showInAppNotice()) {
-        <div class="inapp" role="alert">
-          <span class="inapp__text">
-            For the best experience (calendar &amp; maps), open this in your browser.
-          </span>
-          @if (isAndroid()) {
-            <button type="button" class="inapp__btn" (click)="openInBrowser()">Open in browser</button>
-          } @else {
-            <span class="inapp__hint">Tap <strong>&#xE022;</strong> / <strong>aA</strong> then &ldquo;Open in Safari&rdquo;</span>
-          }
-          <button type="button" class="inapp__close" aria-label="Dismiss" (click)="dismissNotice()">&times;</button>
-        </div>
-      }
-
       @if (showBack()) {
         <button type="button" class="back" aria-label="Go back to the previous step" (click)="goBack()">
           <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
@@ -131,33 +117,8 @@ export class LetterExperience {
   /** The floating back control is only useful on the opened-envelope step. */
   protected readonly showBack = computed(() => this.stage() === 'open');
 
-  /** True when running inside a social-media in-app browser (Messenger, etc.). */
-  protected readonly showInAppNotice = signal(false);
-  protected readonly isAndroid = signal(false);
-
   constructor() {
-    afterNextRender(() => {
-      this.detectInAppBrowser();
-      this.setupOverscrollReturn();
-    });
-  }
-
-  /** Sniff the user-agent for the common in-app browser markers. */
-  private detectInAppBrowser(): void {
-    const ua = navigator.userAgent || '';
-    const inApp = /FBAN|FBAV|FB_IAB|Messenger|Instagram|Line\/|Twitter|MicroMessenger|GSA/i.test(ua);
-    this.isAndroid.set(/Android/i.test(ua));
-    this.showInAppNotice.set(inApp);
-  }
-
-  protected dismissNotice(): void {
-    this.showInAppNotice.set(false);
-  }
-
-  /** On Android, an intent:// URL hands the page off to the default browser. */
-  protected openInBrowser(): void {
-    const { host, pathname, search } = window.location;
-    window.location.href = `intent://${host}${pathname}${search}#Intent;scheme=https;end`;
+    afterNextRender(() => this.setupOverscrollReturn());
   }
 
   /**
