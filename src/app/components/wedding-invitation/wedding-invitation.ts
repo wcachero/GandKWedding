@@ -259,6 +259,14 @@ export class WeddingInvitation {
   }
 
   /**
+   * Close the chooser *after* the browser has followed the calendar link.
+   * Closing synchronously removes the <a> from the DOM and cancels navigation.
+   */
+  protected pickCal(): void {
+    setTimeout(() => this.calOpen.set(false), 600);
+  }
+
+  /**
    * Google Calendar "add event" link. A plain https navigation, so it works
    * inside in-app browsers (Messenger, Instagram) where file downloads do not.
    */
