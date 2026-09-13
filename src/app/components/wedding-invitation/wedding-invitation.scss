@@ -935,6 +935,65 @@
 
 @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 
+/* ----- Add-to-calendar chooser -------------------------------------------- */
+.cal-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+  background: rgba(30, 16, 10, 0.88);
+  animation: fade-in 0.2s ease both;
+
+  &__card {
+    position: relative;
+    width: min(92vw, 360px);
+    padding: clamp(1.5rem, 5vw, 2.25rem);
+    background: var(--color-surface);
+    border-radius: 18px;
+    box-shadow: var(--shadow-md);
+    text-align: center;
+  }
+
+  &__close {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-3);
+    width: 40px;
+    height: 40px;
+    border: 0;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  &__title {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: clamp(1.3rem, 1rem + 1.2vw, 1.7rem);
+    color: var(--color-maroon);
+    margin-bottom: var(--space-6);
+  }
+
+  &__opt {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+
+    & + & { margin-top: var(--space-3); }
+  }
+
+  &__hint {
+    margin-top: var(--space-4);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+  }
+}
+
 /* ----- Map modal ---------------------------------------------------------- */
 .map-modal {
   position: fixed;
