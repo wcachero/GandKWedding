@@ -25,7 +25,7 @@ export interface Wedding {
   /** ISO date used for the live countdown. */
   readonly dateIso: string;
   readonly dateShort: string;
-  readonly dateLong: { readonly month: string; readonly day: string; readonly year: string; readonly weekday: string };
+  readonly dateLong: { readonly month: string; readonly monthShort: string; readonly day: string; readonly year: string; readonly weekday: string };
   readonly ceremonyTime: string;
   readonly heroPhoto: string;
   readonly saveTheDatePhoto: string;
@@ -53,7 +53,7 @@ export const WEDDING: Wedding = {
   monogram: 'G & K',
   dateIso: '2026-12-19T08:30:00+08:00',
   dateShort: '12.19.26',
-  dateLong: { month: 'December', day: '19', year: '2026', weekday: 'Saturday' },
+  dateLong: { month: 'December', monthShort: 'Dec', day: '19', year: '2026', weekday: 'Saturday' },
   ceremonyTime: '8:30 AM Ceremony',
   heroPhoto: 'images/couple-hero.jpg',
   saveTheDatePhoto: 'images/couple-2.jpg',

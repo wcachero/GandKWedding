@@ -193,4 +193,50 @@ export class WeddingInvitation {
   protected pad(n: number): string {
     return n.toString().padStart(2, '0');
   }
+
+  /** Build an .ics file for the wedding and trigger the phone's "Add to Calendar". */
+  protected addToCalendar(): void {
+    const start = new Date(this.wedding.dateIso);
+    const end = new Date(start.getTime() + 5 * 60 * 60 * 1000); // ~5-hour celebration
+    const summary = `${this.wedding.groom} & ${this.wedding.bride} — Wedding`;
+    const description =
+      `Join us as we celebrate the wedding of ${this.wedding.groom} & ${this.wedding.bride}. ` +
+      `Ceremony at ${this.wedding.ceremony.venue}.`;
+
+    const ics = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//GW Moments//Wedding//EN',
+      'CALSCALE:GREGORIAN',
+      'BEGIN:VEVENT',
+      `UID:${this.toIcsDate(start)}-gandk@gwmoments`,
+      `DTSTAMP:${this.toIcsDate(new Date())}`,
+      `DTSTART:${this.toIcsDate(start)}`,
+      `DTEND:${this.toIcsDate(end)}`,
+      `SUMMARY:${this.escapeIcs(summary)}`,
+      `LOCATION:${this.escapeIcs(this.wedding.ceremony.address)}`,
+      `DESCRIPTION:${this.escapeIcs(description)}`,
+      'END:VEVENT',
+      'END:VCALENDAR',
+    ].join('\r\n');
+
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Gilfred-and-Karylle-Wedding.ics';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  /** Format a Date as an ICS UTC timestamp, e.g. 20261219T003000Z. */
+  private toIcsDate(d: Date): string {
+    return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  }
+
+  private escapeIcs(value: string): string {
+    return value.replace(/([,;\\])/g, '\\$1').replace(/\n/g, '\\n');
+  }
 }

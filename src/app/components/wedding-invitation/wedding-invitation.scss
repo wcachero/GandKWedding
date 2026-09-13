@@ -389,6 +389,29 @@
   &__big { font-family: var(--font-heading); font-size: 1.4rem; color: var(--color-maroon); letter-spacing: 0.1em; }
   &__day { font-family: var(--font-heading); font-size: 3rem; line-height: 1; color: var(--color-accent-deep); font-weight: 600; }
   &__small { font-family: var(--font-ui); text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.62rem; color: var(--color-text-muted); }
+
+  /* Full month by default; the abbreviation is swapped in on small phones. */
+  &__month-abbr { display: none; }
+}
+
+.intro__calendar {
+  margin-top: var(--space-8);
+}
+
+/* Keep the date on a single line on phones (abbreviate the month to fit). */
+@media (max-width: 480px) {
+  .datebar {
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    padding-inline: 0.5rem;
+
+    &__big { font-size: 1.05rem; }
+    &__day { font-size: 2.1rem; }
+    &__small { font-size: 0.5rem; letter-spacing: 0.1em; }
+    &__cell--day { padding-inline: var(--space-3); }
+    &__month-full { display: none; }
+    &__month-abbr { display: inline; }
+  }
 }
 
 /* ----- Countdown ---------------------------------------------------------- */
