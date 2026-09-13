@@ -168,7 +168,7 @@ export class WeddingInvitation {
     return {
       ...event,
       mapEmbed: this.sanitizer.bypassSecurityTrustResourceUrl(
-        `https://www.google.com/maps?q=${q}&output=embed`,
+        `https://maps.google.com/maps?q=${q}&z=15&hl=en&t=&ie=UTF8&iwloc=B&output=embed`,
       ),
       mapLink: `https://www.google.com/maps/search/?api=1&query=${q}`,
     };
