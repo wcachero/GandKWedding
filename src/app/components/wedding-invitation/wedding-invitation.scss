@@ -76,36 +76,69 @@
   gap: var(--space-4);
   padding: var(--space-3) clamp(1rem, 4vw, 2.5rem);
   isolation: isolate;
-  background: rgba(195, 164, 107, 0.22);
-  backdrop-filter: blur(24px) saturate(1.8);
-  -webkit-backdrop-filter: blur(24px) saturate(1.8);
-  border-bottom: 0.5px solid rgba(255, 248, 230, 0.38);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 248, 230, 0.38) 0%,
+    rgba(195, 164, 107, 0.62) 48%,
+    rgba(169, 129, 42, 0.55) 100%
+  );
+  backdrop-filter: blur(28px) saturate(1.85);
+  -webkit-backdrop-filter: blur(28px) saturate(1.85);
+  border-bottom: 1px solid rgba(255, 248, 230, 0.42);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.42),
-    inset 0 -1px 0 rgba(195, 164, 107, 0.18),
-    0 8px 28px rgba(18, 14, 8, 0.22);
+    inset 0 1px 0 rgba(255, 255, 255, 0.58),
+    inset 0 -1px 0 rgba(61, 36, 24, 0.14),
+    0 10px 32px rgba(18, 14, 8, 0.16);
 
-  &::before {
+  &::before,
+  &::after {
     content: "";
     position: absolute;
+    pointer-events: none;
+  }
+
+  &::before {
     inset: 0;
     z-index: -1;
+    background:
+      linear-gradient(
+        115deg,
+        rgba(255, 255, 255, 0.42) 0%,
+        rgba(255, 255, 255, 0.1) 22%,
+        transparent 46%,
+        rgba(195, 164, 107, 0.18) 100%
+      ),
+      linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.22) 42%,
+        rgba(255, 248, 230, 0.08) 50%,
+        transparent 58%
+      );
+    background-size: 100% 100%, 220% 100%;
+    animation: nav-liquid-shine 9s ease-in-out infinite;
+  }
+
+  &::after {
+    left: 10%;
+    right: 10%;
+    top: 0;
+    height: 1px;
+    z-index: 1;
     background: linear-gradient(
-      180deg,
-      rgba(255, 248, 230, 0.22) 0%,
-      rgba(195, 164, 107, 0.08) 45%,
-      rgba(195, 164, 107, 0.14) 100%
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.72),
+      transparent
     );
-    pointer-events: none;
   }
 
   &__brand {
     font-family: var(--font-script);
     font-size: 1.8rem;
     line-height: 1;
-    color: #f8f1dc;
+    color: #3d2418;
     white-space: nowrap;
-    text-shadow: 0 1px 10px rgba(18, 14, 8, 0.35);
   }
 
   &__brand-word {
@@ -128,7 +161,7 @@
       height: 2px;
       width: 100%;
       border-radius: 2px;
-      background: var(--color-maroon);
+      background: #3d2418;
       transition: transform 0.3s ease, opacity 0.2s ease;
     }
   }
@@ -144,12 +177,12 @@
     font-size: 0.72rem;
 
     a {
-      color: #fff8ef;
+      color: #3d2418;
       padding-bottom: 2px;
       border-bottom: 1px solid transparent;
       transition: color 0.2s ease, border-color 0.2s ease;
 
-      &:hover { color: #e7d8bc; border-color: #c3a46b; }
+      &:hover { color: #2a1810; border-color: #2a1810; }
     }
   }
 
@@ -166,14 +199,17 @@
       align-items: center;
       gap: var(--space-4);
       padding: var(--space-6);
-      background: rgba(195, 164, 107, 0.28);
-      backdrop-filter: blur(28px) saturate(1.8);
-      -webkit-backdrop-filter: blur(28px) saturate(1.8);
-      border-bottom: 0.5px solid rgba(255, 248, 230, 0.35);
+      background: linear-gradient(
+        180deg,
+        rgba(255, 248, 230, 0.34) 0%,
+        rgba(195, 164, 107, 0.7) 100%
+      );
+      backdrop-filter: blur(28px) saturate(1.85);
+      -webkit-backdrop-filter: blur(28px) saturate(1.85);
+      border-bottom: 1px solid rgba(255, 248, 230, 0.42);
       box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.28),
-        0 12px 32px rgba(18, 14, 8, 0.28);
-      box-shadow: var(--shadow-md);
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        0 16px 36px rgba(18, 14, 8, 0.2);
       font-size: 0.9rem;
 
       /* hidden by default */
@@ -196,9 +232,16 @@
   }
 }
 
+@keyframes nav-liquid-shine {
+  0%, 100% { background-position: 0% 0%, 0% 0%; }
+  50% { background-position: 0% 0%, 100% 0%; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .nav__toggle span,
   .nav__links { transition: none; }
+
+  .nav::before { animation: none; }
 }
 
 /* ----- Parallax hero ------------------------------------------------------ */

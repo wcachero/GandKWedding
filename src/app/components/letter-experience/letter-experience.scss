@@ -198,10 +198,63 @@
   align-items: stretch;
   justify-content: center;
   gap: clamp(0.1rem, 1.5vw, 0.75rem);
-  background: rgba(244, 241, 234, 0.94);
-  backdrop-filter: blur(12px);
-  border-top: 1px solid var(--color-border);
-  box-shadow: 0 -4px 20px rgba(60, 30, 20, 0.08);
+  isolation: isolate;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 248, 230, 0.4) 0%,
+    rgba(195, 164, 107, 0.62) 52%,
+    rgba(169, 129, 42, 0.55) 100%
+  );
+  backdrop-filter: blur(28px) saturate(1.85);
+  -webkit-backdrop-filter: blur(28px) saturate(1.85);
+  border-top: 1px solid rgba(255, 248, 230, 0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.58),
+    inset 0 -1px 0 rgba(61, 36, 24, 0.14),
+    0 -10px 28px rgba(18, 14, 8, 0.16);
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+  }
+
+  &::before {
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(
+        115deg,
+        rgba(255, 255, 255, 0.42) 0%,
+        rgba(255, 255, 255, 0.1) 22%,
+        transparent 46%,
+        rgba(195, 164, 107, 0.18) 100%
+      ),
+      linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.22) 42%,
+        rgba(255, 248, 230, 0.08) 50%,
+        transparent 58%
+      );
+    background-size: 100% 100%, 220% 100%;
+    animation: tabbar-liquid-shine 9s ease-in-out infinite;
+  }
+
+  &::after {
+    left: 10%;
+    right: 10%;
+    top: 0;
+    height: 1px;
+    z-index: 1;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.72),
+      transparent
+    );
+  }
 
   &__item {
     flex: 1 1 0;
@@ -212,7 +265,7 @@
     align-items: center;
     justify-content: center;
     gap: 3px;
-    color: var(--color-text-muted);
+    color: #3d2418;
     font-family: var(--font-ui);
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -223,7 +276,7 @@
 
     &:hover,
     &:active {
-      color: var(--color-accent-deep);
+      color: #2a1810;
       transform: translateY(-2px);
     }
 
@@ -254,22 +307,19 @@
 }
 
 .scene[data-stage='reading'] .tabbar {
-  background: rgba(195, 164, 107, 0.22);
-  backdrop-filter: blur(24px) saturate(1.8);
-  -webkit-backdrop-filter: blur(24px) saturate(1.8);
-  border-top: 0.5px solid rgba(255, 248, 230, 0.35);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    0 -8px 24px rgba(18, 14, 8, 0.25);
-
   .tabbar__item {
-    color: #efe4c8;
+    color: #3d2418;
 
     &:hover,
     &:active {
-      color: #e7d8bc;
+      color: #2a1810;
     }
   }
+}
+
+@keyframes tabbar-liquid-shine {
+  0%, 100% { background-position: 0% 0%, 0% 0%; }
+  50% { background-position: 0% 0%, 100% 0%; }
 }
 
 /* Reserve space so the tab bar never covers the end of the footer. */
@@ -280,6 +330,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .tabbar__item { transition: none; }
+  .tabbar::before { animation: none; }
 }
 
 .scene[data-stage='open'] .back {
