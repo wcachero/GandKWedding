@@ -2,19 +2,19 @@
   display: block;
   width: 100%;
   overflow-x: clip;
-  /* Inverted invitation palette — cream type on dark muted gold */
-  --color-bg: #1a1810;
-  --color-bg-deep: #14120c;
-  --color-surface: #2c281c;
-  --color-text: #f3ead4;
-  --color-text-muted: #d4c8a8;
-  --color-maroon: #efe4c8;
+  /* Invitation sections — warm peach with cocoa type */
+  --color-bg: #edc4a4;
+  --color-bg-deep: #e3a379;
+  --color-surface: #f7e6d6;
+  --color-text: #453a32;
+  --color-text-muted: #6b5a4c;
+  --color-maroon: #5e4635;
   --color-accent: #c3a46b;
-  --color-accent-deep: #e7d8bc;
-  --color-accent-contrast: #1a1810;
-  --color-border: rgba(195, 164, 107, 0.28);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --color-accent-deep: #9a7d45;
+  --color-accent-contrast: #fff8ef;
+  --color-border: rgba(179, 113, 76, 0.28);
+  --shadow-sm: 0 1px 3px rgba(94, 70, 53, 0.12);
+  --shadow-md: 0 8px 24px rgba(94, 70, 53, 0.16);
   color: var(--color-text);
   background: var(--color-bg);
 }
@@ -30,6 +30,7 @@
 .section {
   padding-block: clamp(3rem, 8vw, 6rem);
   scroll-margin-top: 72px; /* offset for the sticky nav */
+  background: var(--color-bg);
 
   &__label {
     text-align: center;

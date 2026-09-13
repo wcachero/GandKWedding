@@ -20,7 +20,7 @@
     padding: 0;
     place-items: initial;
     overflow: visible;
-    background: #1a1210;
+    background: #1a1810;
     min-height: 100vh;
     min-height: 100dvh;
 
@@ -80,13 +80,13 @@
     background:
       linear-gradient(
         180deg,
-        rgba(94, 70, 53, 0.42) 0%,
-        rgba(207, 143, 107, 0.32) 42%,
-        rgba(124, 33, 48, 0.4) 100%
+        rgba(195, 164, 107, 0.42) 0%,
+        rgba(195, 164, 107, 0.22) 42%,
+        rgba(169, 129, 42, 0.38) 100%
       ),
       linear-gradient(
         210deg,
-        rgba(179, 113, 76, 0.28) 0%,
+        rgba(195, 164, 107, 0.28) 0%,
         transparent 55%
       );
   }
@@ -158,7 +158,7 @@
     place-items: initial;
     padding: 0;
     overflow: visible;
-    background: #1a1810;
+    background: #edc4a4;
 
     .scene__content { display: block; }
     .scene__footer { margin-top: 0; }
@@ -249,8 +249,8 @@
 }
 
 .scene[data-stage='reading'] .overscroll-hint {
-  color: #d4c8a8;
-  background: #14120c;
+  color: #6b5a4c;
+  background: #e3a379;
 }
 
 .scene[data-stage='reading'] .tabbar {
