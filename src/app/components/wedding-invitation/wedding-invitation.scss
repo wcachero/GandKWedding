@@ -247,12 +247,19 @@
   &__date { animation-delay: 3.4s; }  /* extra ~0.5s pause before the date */
 
   &__kicker {
+    position: absolute;
+    top: clamp(2rem, 8vh, 5rem);
+    left: 0;
+    right: 0;
+    z-index: 2;
+    text-align: center;
+    color: #fff;
     font-family: var(--font-ui);
     text-transform: uppercase;
     letter-spacing: 0.34em;
     font-size: 0.9rem;
     opacity: 0.9;
-    margin-bottom: var(--space-8);
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
   }
 
   &__names {
