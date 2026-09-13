@@ -56,3 +56,12 @@
     animation: none;
   }
 }
+
+:host-context(.scene[data-stage='open']) .player__disc img {
+  width: clamp(40px, 7vw, 52px);
+}
+
+:host-context(.scene[data-stage='reading']) .player__label {
+  color: #f4eee4;
+  text-shadow: 0 1px 8px rgba(20, 10, 8, 0.55);
+}

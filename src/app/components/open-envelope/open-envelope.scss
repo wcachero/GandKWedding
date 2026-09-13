@@ -1,26 +1,26 @@
 :host {
   display: block;
+  width: auto;
 }
 
 .stage {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--space-6);
-  text-align: center;
+  align-items: flex-end;
 }
 
 .envelope {
   border: 0;
   padding: 0;
   background: transparent;
-  width: min(80vw, 480px);
+  width: min(82vw, 480px);
   transition: transform 0.35s ease;
 
   &__art {
     width: 100%;
     height: auto;
-    filter: drop-shadow(0 18px 30px rgba(120, 0, 20, 0.25));
+    overflow: visible;
+    filter: drop-shadow(0 18px 30px rgba(94, 70, 53, 0.36));
   }
 
   .letter {
@@ -29,29 +29,37 @@
     animation: rise 0.7s ease both;
   }
 
+  &--reveal .letter {
+    animation: come-out 1.5s cubic-bezier(0.22, 0.8, 0.32, 1) forwards;
+  }
+
   &:hover .letter,
   &:focus-visible .letter {
     transform: translateY(-8px);
     transition: transform 0.3s ease;
   }
 
+  &--reveal:hover .letter,
+  &--reveal:focus-visible .letter {
+    transform: none;
+  }
+
   &:focus-visible {
-    outline: 3px solid var(--color-maroon);
+    outline: 3px solid var(--color-accent);
     outline-offset: 8px;
     border-radius: var(--radius);
   }
 }
 
-.stage__hint {
-  font-family: var(--font-body);
-  font-size: var(--fs-400);
-  font-weight: 600;
-  color: var(--color-maroon);
-}
-
 @keyframes rise {
   from { transform: translateY(26px); opacity: 0; }
   to   { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes come-out {
+  0% { transform: translateY(0); }
+  70% { transform: translateY(-118px); }
+  100% { transform: translateY(-128px); }
 }
 
 @media (prefers-reduced-motion: reduce) {

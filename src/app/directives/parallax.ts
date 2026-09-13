@@ -24,6 +24,7 @@ export class Parallax implements AfterViewInit, OnDestroy {
 
   private ticking = false;
   private readonly onScroll = (): void => this.request();
+  private viewport: VisualViewport | null = null;
 
   ngAfterViewInit(): void {
     if (this.prefersReduced() || typeof window === 'undefined') {
@@ -32,6 +33,11 @@ export class Parallax implements AfterViewInit, OnDestroy {
     this.zone.runOutsideAngular(() => {
       window.addEventListener('scroll', this.onScroll, { passive: true });
       window.addEventListener('resize', this.onScroll, { passive: true });
+      // iOS Safari updates more reliably on touch + visualViewport than window scroll alone.
+      window.addEventListener('touchmove', this.onScroll, { passive: true });
+      this.viewport = window.visualViewport ?? null;
+      this.viewport?.addEventListener('scroll', this.onScroll);
+      this.viewport?.addEventListener('resize', this.onScroll);
       this.update();
     });
   }
@@ -42,6 +48,9 @@ export class Parallax implements AfterViewInit, OnDestroy {
     }
     window.removeEventListener('scroll', this.onScroll);
     window.removeEventListener('resize', this.onScroll);
+    window.removeEventListener('touchmove', this.onScroll);
+    this.viewport?.removeEventListener('scroll', this.onScroll);
+    this.viewport?.removeEventListener('resize', this.onScroll);
   }
 
   private request(): void {

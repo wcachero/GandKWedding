@@ -48,8 +48,8 @@ export interface Wedding {
 }
 
 export const WEDDING: Wedding = {
-  groom: 'John Gilfred',
-  bride: 'Karylle Ann',
+  groom: 'Gilfred',
+  bride: 'Karyle Ann',
   monogram: 'G & K',
   dateIso: '2026-12-19T08:30:00+08:00',
   dateShort: '12.19.26',

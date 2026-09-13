@@ -14,11 +14,11 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should start on the sealed envelope with the invitation title', async () => {
+  it('should start on the sealed envelope', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain("You're Invited!");
-    expect(compiled.textContent).toContain('tap the envelope to open');
+    expect(compiled.querySelector('[aria-label="Open the envelope"]')).toBeTruthy();
+    expect(compiled.textContent).toContain('Tap the envelope to open');
   });
 });

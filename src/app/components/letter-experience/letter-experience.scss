@@ -13,6 +13,130 @@
     radial-gradient(120% 90% at 50% 0%, var(--color-bg) 0%, var(--color-bg-deep) 100%);
   overflow: hidden;
 
+  /* Photo backdrop for the sealed + opened envelope steps */
+  &[data-stage='sealed'],
+  &[data-stage='open'] {
+    display: block;
+    padding: 0;
+    place-items: initial;
+    overflow: visible;
+    background: #1a1210;
+    min-height: 100vh;
+    min-height: 100dvh;
+
+    .scene__content {
+      position: relative;
+      z-index: 1;
+      align-self: auto;
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .scene__stage-bg {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+    }
+
+    .scene__stage-bg-photo {
+      object-fit: cover;
+      object-position: center center;
+    }
+
+    @media (max-width: 768px) {
+      .scene__stage-bg-photo {
+        object-position: center 22%;
+      }
+    }
+  }
+
+  &__stage-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  &__stage-bg-photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: contain;
+    object-position: center;
+  }
+
+  &__stage-bg-scrim {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(94, 70, 53, 0.42) 0%,
+        rgba(207, 143, 107, 0.32) 42%,
+        rgba(124, 33, 48, 0.4) 100%
+      ),
+      linear-gradient(
+        210deg,
+        rgba(179, 113, 76, 0.28) 0%,
+        transparent 55%
+      );
+  }
+
+  &__invite {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.18em;
+    margin: 0;
+    padding: calc(env(safe-area-inset-top, 0px) + var(--space-12)) var(--space-6) var(--space-4);
+    text-align: center;
+    font-family: var(--font-script);
+    font-size: clamp(3.85rem, 2.6rem + 7.5vw, 7.25rem);
+    font-weight: 400;
+    line-height: 1.18;
+    color: #f7f1e6;
+    text-shadow:
+      0 0 8px rgba(20, 10, 8, 0.7),
+      0 2px 22px rgba(30, 16, 12, 0.55);
+
+    span {
+      display: block;
+    }
+
+    @media (min-width: 769px) {
+      align-self: flex-end;
+      align-items: flex-end;
+      text-align: right;
+      padding-top: calc(env(safe-area-inset-top, 0px) + var(--space-8));
+      padding-right: clamp(var(--space-6), 4vw, var(--space-16));
+    }
+  }
+
+  &[data-stage='open'] .scene__invite {
+    @media (min-width: 769px) {
+      padding-top: calc(env(safe-area-inset-top, 0px) + 4.75rem);
+    }
+  }
+
+  &__fg {
+    position: fixed;
+    z-index: 3;
+    right: var(--space-6);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + var(--space-8));
+    width: auto;
+  }
+
   &__content {
     position: relative;
     z-index: 1;
@@ -34,6 +158,7 @@
     place-items: initial;
     padding: 0;
     overflow: visible;
+    background: #1a1810;
 
     .scene__content { display: block; }
     .scene__footer { margin-top: 0; }
@@ -45,6 +170,13 @@
   bottom: clamp(var(--space-4), 3vw, var(--space-8));
   right: clamp(var(--space-4), 3vw, var(--space-8));
   z-index: 5;
+}
+
+.scene[data-stage='open'] .scene__music {
+  top: calc(env(safe-area-inset-top, 0px) + var(--space-4));
+  right: var(--space-4);
+  bottom: auto;
+  left: auto;
 }
 
 /* When the invitation is open, lift the disc above the bottom tab bar. */
@@ -116,6 +248,30 @@
   background: var(--color-bg-deep);
 }
 
+.scene[data-stage='reading'] .overscroll-hint {
+  color: #d4c8a8;
+  background: #14120c;
+}
+
+.scene[data-stage='reading'] .tabbar {
+  background: rgba(195, 164, 107, 0.22);
+  backdrop-filter: blur(24px) saturate(1.8);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
+  border-top: 0.5px solid rgba(255, 248, 230, 0.35);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 -8px 24px rgba(18, 14, 8, 0.25);
+
+  .tabbar__item {
+    color: #efe4c8;
+
+    &:hover,
+    &:active {
+      color: #e7d8bc;
+    }
+  }
+}
+
 /* Reserve space so the tab bar never covers the end of the footer. */
 .scene[data-stage='reading'] {
   --tabbar-h: 62px;
@@ -124,6 +280,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .tabbar__item { transition: none; }
+}
+
+.scene[data-stage='open'] .back {
+  position: fixed;
 }
 
 .back {

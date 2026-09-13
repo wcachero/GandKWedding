@@ -1,10 +1,22 @@
 :host {
   display: block;
   width: 100%;
-  /* Clip any stray horizontal overflow (e.g. animated glows, wide rows) on
-     mobile. `clip` (not `hidden`) does NOT create a scroll container, so the
-     sticky nav keeps working. */
   overflow-x: clip;
+  /* Inverted invitation palette — cream type on dark muted gold */
+  --color-bg: #1a1810;
+  --color-bg-deep: #14120c;
+  --color-surface: #2c281c;
+  --color-text: #f3ead4;
+  --color-text-muted: #d4c8a8;
+  --color-maroon: #efe4c8;
+  --color-accent: #c3a46b;
+  --color-accent-deep: #e7d8bc;
+  --color-accent-contrast: #1a1810;
+  --color-border: rgba(195, 164, 107, 0.28);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  color: var(--color-text);
+  background: var(--color-bg);
 }
 
 /* Shared inner width */
@@ -62,16 +74,37 @@
   justify-content: space-between;
   gap: var(--space-4);
   padding: var(--space-3) clamp(1rem, 4vw, 2.5rem);
-  background: rgba(244, 241, 234, 0.92);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--color-border);
+  isolation: isolate;
+  background: rgba(195, 164, 107, 0.22);
+  backdrop-filter: blur(24px) saturate(1.8);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
+  border-bottom: 0.5px solid rgba(255, 248, 230, 0.38);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -1px 0 rgba(195, 164, 107, 0.18),
+    0 8px 28px rgba(18, 14, 8, 0.22);
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 248, 230, 0.22) 0%,
+      rgba(195, 164, 107, 0.08) 45%,
+      rgba(195, 164, 107, 0.14) 100%
+    );
+    pointer-events: none;
+  }
 
   &__brand {
     font-family: var(--font-script);
     font-size: 1.8rem;
     line-height: 1;
-    color: var(--color-accent-deep);
+    color: #f8f1dc;
     white-space: nowrap;
+    text-shadow: 0 1px 10px rgba(18, 14, 8, 0.35);
   }
 
   &__brand-word {
@@ -110,12 +143,12 @@
     font-size: 0.72rem;
 
     a {
-      color: var(--color-text);
+      color: #fff8ef;
       padding-bottom: 2px;
       border-bottom: 1px solid transparent;
       transition: color 0.2s ease, border-color 0.2s ease;
 
-      &:hover { color: var(--color-accent-deep); border-color: var(--color-accent); }
+      &:hover { color: #e7d8bc; border-color: #c3a46b; }
     }
   }
 
@@ -132,8 +165,13 @@
       align-items: center;
       gap: var(--space-4);
       padding: var(--space-6);
-      background: rgba(244, 241, 234, 0.98);
-      border-bottom: 1px solid var(--color-border);
+      background: rgba(195, 164, 107, 0.28);
+      backdrop-filter: blur(28px) saturate(1.8);
+      -webkit-backdrop-filter: blur(28px) saturate(1.8);
+      border-bottom: 0.5px solid rgba(255, 248, 230, 0.35);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.28),
+        0 12px 32px rgba(18, 14, 8, 0.28);
       box-shadow: var(--shadow-md);
       font-size: 0.9rem;
 
@@ -265,7 +303,7 @@
   &__names {
     font-family: var(--font-script);
     font-weight: 400;
-    line-height: 0.95;
+    line-height: 1.3;
     font-size: clamp(3.2rem, 1.8rem + 8vw, 7rem);
     display: flex;
     flex-direction: column;

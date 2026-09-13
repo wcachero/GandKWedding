@@ -31,6 +31,13 @@ const STAGE_ORDER: readonly Stage[] = ['sealed', 'open', 'reading'];
   imports: [SealedEnvelope, OpenEnvelope, WeddingInvitation, SiteFooter, MusicDisc],
   template: `
     <div class="scene" [attr.data-stage]="stage()">
+      @if (stage() !== 'reading') {
+        <div class="scene__stage-bg" aria-hidden="true">
+          <img class="scene__stage-bg-photo" src="images/envelope-stage-bg.jpg" alt="" />
+          <div class="scene__stage-bg-scrim"></div>
+        </div>
+      }
+
       @if (showBack()) {
         <button type="button" class="back" aria-label="Go back to the previous step" (click)="goBack()">
           <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
@@ -42,16 +49,23 @@ const STAGE_ORDER: readonly Stage[] = ['sealed', 'open', 'reading'];
       }
 
       <div class="scene__content">
-        @switch (stage()) {
-          @case ('sealed') {
-            <app-sealed-envelope (open)="openEnvelope()" />
-          }
-          @case ('open') {
-            <app-open-envelope (read)="stage.set('reading')" />
-          }
-          @case ('reading') {
-            <app-wedding-invitation />
-          }
+        @if (stage() === 'reading') {
+          <app-wedding-invitation />
+        } @else {
+          <h1 class="scene__invite">
+            <span>You're</span>
+            <span>Invited</span>
+          </h1>
+          <div class="scene__fg">
+            @switch (stage()) {
+              @case ('sealed') {
+                <app-sealed-envelope (open)="openEnvelope()" />
+              }
+              @case ('open') {
+                <app-open-envelope (read)="openInvitation()" />
+              }
+            }
+          </div>
         }
       </div>
 
@@ -173,6 +187,12 @@ export class LetterExperience {
   protected openEnvelope(): void {
     this.stage.set('open');
     void this.audio.play();
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }
+
+  protected openInvitation(): void {
+    this.stage.set('reading');
+    window.scrollTo({ top: 0, behavior: 'auto' });
   }
 
   protected goBack(): void {
