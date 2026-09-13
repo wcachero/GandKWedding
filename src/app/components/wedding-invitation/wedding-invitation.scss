@@ -395,7 +395,10 @@
 }
 
 .intro__calendar {
-  margin-top: var(--space-8);
+  /* Own line, centred, sized to its content (not beside the date bar). */
+  display: flex;
+  width: fit-content;
+  margin: var(--space-8) auto 0;
 }
 
 /* Keep the date on a single line on phones (abbreviate the month to fit). */
