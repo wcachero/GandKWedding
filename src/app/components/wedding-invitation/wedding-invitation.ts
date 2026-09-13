@@ -7,7 +7,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 import QRCode from 'qrcode';
 import { WEDDING, WeddingEvent } from '../../data/wedding';
 import { Reveal } from '../../directives/reveal';
@@ -120,6 +120,17 @@ export class WeddingInvitation {
     afterNextRender(() => {
       const url = `${window.location.origin}/`;
       this.shareUrl.set(url);
+
+      // iOS: webcal:// opens the Calendar app on a single tap (even inside
+      // Messenger's in-app browser, where an https .ics only renders as text).
+      const isIos =
+        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      if (isIos) {
+        this.icsHref.set(
+          this.sanitizer.bypassSecurityTrustUrl(`webcal://${window.location.host}/wedding.ics`),
+        );
+      }
       QRCode.toDataURL(url, {
         errorCorrectionLevel: 'H', // high recovery so the centre badge is safe
         margin: 1,
@@ -231,6 +242,13 @@ export class WeddingInvitation {
 
   /** Whether the "Add to Calendar" chooser is open. */
   protected readonly calOpen = signal(false);
+
+  /**
+   * Link for the .ics option. On iOS the webcal:// scheme is handed straight
+   * to the Calendar app (a normal tap on an https .ics only shows raw text
+   * inside in-app browsers like Messenger). Other platforms use the https file.
+   */
+  protected readonly icsHref = signal<string | SafeUrl>('wedding.ics');
 
   protected openCal(): void {
     this.calOpen.set(true);

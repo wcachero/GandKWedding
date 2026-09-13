@@ -267,7 +267,7 @@
       <a class="btn cal-modal__opt" [href]="googleCalUrl" target="_blank" rel="noopener" (click)="closeCal()">
         Google Calendar
       </a>
-      <a class="btn cal-modal__opt" href="wedding.ics" target="_blank" rel="noopener" (click)="closeCal()">
+      <a class="btn cal-modal__opt" [href]="icsHref()" rel="noopener" (click)="closeCal()">
         Apple / Outlook (.ics)
       </a>
       <p class="cal-modal__hint">
