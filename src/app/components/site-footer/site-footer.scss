@@ -90,40 +90,4 @@
     letter-spacing: 0.08em;
     color: var(--color-text-muted);
   }
-
-  &__restart {
-    margin-top: var(--space-6);
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-3) var(--space-6);
-    border: 1px solid var(--color-maroon);
-    border-radius: 999px;
-    background: transparent;
-    color: var(--color-maroon);
-    font-family: var(--font-ui);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    font-size: 0.7rem;
-    cursor: pointer;
-    transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
-
-    svg { display: block; }
-
-    &:hover {
-      transform: translateY(-2px);
-      background: var(--color-maroon);
-      color: #fff;
-    }
-
-    &:focus-visible {
-      outline: 3px solid var(--color-maroon);
-      outline-offset: 3px;
-    }
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .footer__restart { transition: none; }
 }

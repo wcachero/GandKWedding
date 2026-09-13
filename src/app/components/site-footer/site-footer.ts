@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { WEDDING } from '../../data/wedding';
 
 /**
@@ -54,14 +54,6 @@ import { WEDDING } from '../../data/wedding';
         <p class="footer__brand">GW Moments</p>
         <p class="footer__tagline">Your Moment. Your Story. Your Way.</p>
         <p class="footer__copyright">&copy; 2026 GW Moments. All rights reserved.</p>
-
-        <button type="button" class="footer__restart" (click)="restart.emit()">
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-            <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                  stroke-linejoin="round" d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm.4.7L12 12l7.6-6.3"/>
-          </svg>
-          <span>Back to the envelope</span>
-        </button>
       </div>
     </footer>
   `,
@@ -69,7 +61,4 @@ import { WEDDING } from '../../data/wedding';
 })
 export class SiteFooter {
   protected readonly socials = WEDDING.socials;
-
-  /** Emitted when the guest taps "Back to the envelope" to replay from the start. */
-  readonly restart = output<void>();
 }

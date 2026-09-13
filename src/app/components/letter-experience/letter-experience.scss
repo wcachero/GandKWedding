@@ -65,14 +65,16 @@
   display: flex;
   align-items: stretch;
   justify-content: center;
-  gap: clamp(0.5rem, 6vw, 3rem);
+  gap: clamp(0.1rem, 1.5vw, 0.75rem);
   background: rgba(244, 241, 234, 0.94);
   backdrop-filter: blur(12px);
   border-top: 1px solid var(--color-border);
   box-shadow: 0 -4px 20px rgba(60, 30, 20, 0.08);
 
   &__item {
-    flex: 0 1 96px;
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 92px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -81,11 +83,11 @@
     color: var(--color-text-muted);
     font-family: var(--font-ui);
     text-transform: uppercase;
-    letter-spacing: 0.12em;
-    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    font-size: 0.58rem;
     transition: color 0.2s ease, transform 0.2s ease;
 
-    svg { display: block; }
+    svg { display: block; width: 22px; height: 22px; }
 
     &:hover,
     &:active {
@@ -99,6 +101,19 @@
       border-radius: 8px;
     }
   }
+}
+
+/* Hint shown under the footer inviting the pull-up-to-restart gesture. */
+.overscroll-hint {
+  margin: 0;
+  padding: var(--space-6) var(--space-6) var(--space-4);
+  text-align: center;
+  font-family: var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.62rem;
+  color: var(--color-text-muted);
+  background: var(--color-bg-deep);
 }
 
 /* Reserve space so the tab bar never covers the end of the footer. */
