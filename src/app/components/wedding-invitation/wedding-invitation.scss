@@ -176,9 +176,8 @@
     position: absolute;
     left: 0;
     width: 100%;
-    /* extra overflow so the parallax travel never reveals an edge */
-    top: -20%;
-    height: 140%;
+    top: -8%;
+    height: 116%;
     will-change: transform;
     /* short pause, then the banner fades into view */
     animation: banner-in 1.6s ease 0.5s both;
