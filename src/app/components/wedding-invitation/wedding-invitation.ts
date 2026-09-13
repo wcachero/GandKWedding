@@ -2,11 +2,13 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  afterNextRender,
   computed,
   inject,
   signal,
 } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import QRCode from 'qrcode';
 import { WEDDING, WeddingEvent } from '../../data/wedding';
 import { Reveal } from '../../directives/reveal';
 import { Parallax } from '../../directives/parallax';
@@ -77,6 +79,21 @@ export class WeddingInvitation {
     this.menuOpen.set(false);
   }
 
+  /** Short monogram (no spaces) shown in the centre of the QR code. */
+  protected readonly qrBadge = WEDDING.monogram.replace(/\s+/g, '');
+
+  /** Public URL of this invitation, resolved in the browser. */
+  protected readonly shareUrl = signal('');
+
+  /** Data-URL of the generated QR code (null until rendered in the browser). */
+  protected readonly qrDataUrl = signal<string | null>(null);
+
+  /** Whether the enlarged QR modal is open. */
+  protected readonly qrOpen = signal(false);
+
+  /** Rolling hint under the Share tile ("Tap to share" → "Link copied!"). */
+  protected readonly shareHint = signal('Tap to share');
+
   /** Photo currently open in the lightbox, or null when closed. */
   protected readonly lightboxPhoto = signal<string | null>(null);
 
@@ -90,6 +107,53 @@ export class WeddingInvitation {
   constructor() {
     const id = setInterval(() => this.now.set(Date.now()), 1000);
     inject(DestroyRef).onDestroy(() => clearInterval(id));
+
+    // Resolve the live URL and render the QR code only in the browser
+    // (window is unavailable during prerendering).
+    afterNextRender(() => {
+      const url = `${window.location.origin}/`;
+      this.shareUrl.set(url);
+      QRCode.toDataURL(url, {
+        errorCorrectionLevel: 'H', // high recovery so the centre badge is safe
+        margin: 1,
+        width: 640,
+        color: { dark: '#6b3b2e', light: '#ffffff' },
+      })
+        .then((data) => this.qrDataUrl.set(data))
+        .catch(() => this.qrDataUrl.set(null));
+    });
+  }
+
+  protected openQr(): void {
+    this.qrOpen.set(true);
+  }
+
+  protected closeQr(): void {
+    this.qrOpen.set(false);
+  }
+
+  /** Share via the native share sheet (mobile), falling back to clipboard copy. */
+  protected async shareSite(): Promise<void> {
+    const url = this.shareUrl() || window.location.href;
+    const shareData = {
+      title: `${this.wedding.groom} & ${this.wedding.bride} — Wedding Invitation`,
+      text: "You're invited! Join us as we celebrate our wedding.",
+      url,
+    };
+    const nav = window.navigator as Navigator & {
+      share?: (data: ShareData) => Promise<void>;
+    };
+    try {
+      if (nav.share) {
+        await nav.share(shareData);
+        this.shareHint.set('Thanks for sharing!');
+      } else {
+        await navigator.clipboard.writeText(url);
+        this.shareHint.set('Link copied!');
+      }
+    } catch {
+      // User dismissed the share sheet, or clipboard was blocked — ignore.
+    }
   }
 
   private toEventView(event: WeddingEvent): EventView {

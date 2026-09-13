@@ -47,6 +47,70 @@
   z-index: 5;
 }
 
+/* When the invitation is open, lift the disc above the bottom tab bar. */
+.scene[data-stage='reading'] .scene__music {
+  bottom: calc(var(--tabbar-h) + var(--space-4));
+}
+
+/* ----- Bottom tab bar (Home / RSVP / Gallery) ----------------------------- */
+.tabbar {
+  --tabbar-h: 62px;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  height: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: clamp(0.5rem, 6vw, 3rem);
+  background: rgba(244, 241, 234, 0.94);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--color-border);
+  box-shadow: 0 -4px 20px rgba(60, 30, 20, 0.08);
+
+  &__item {
+    flex: 0 1 96px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    color: var(--color-text-muted);
+    font-family: var(--font-ui);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.6rem;
+    transition: color 0.2s ease, transform 0.2s ease;
+
+    svg { display: block; }
+
+    &:hover,
+    &:active {
+      color: var(--color-accent-deep);
+      transform: translateY(-2px);
+    }
+
+    &:focus-visible {
+      outline: 3px solid var(--color-accent);
+      outline-offset: 2px;
+      border-radius: 8px;
+    }
+  }
+}
+
+/* Reserve space so the tab bar never covers the end of the footer. */
+.scene[data-stage='reading'] {
+  --tabbar-h: 62px;
+  padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tabbar__item { transition: none; }
+}
+
 .back {
   position: absolute;
   top: clamp(var(--space-4), 3vw, var(--space-8));

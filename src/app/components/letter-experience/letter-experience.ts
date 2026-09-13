@@ -54,7 +54,31 @@ const STAGE_ORDER: readonly Stage[] = ['sealed', 'open', 'reading'];
       }
 
       @if (stage() === 'reading') {
-        <app-site-footer class="scene__footer" />
+        <app-site-footer class="scene__footer" (restart)="restart()" />
+
+        <nav class="tabbar" aria-label="Quick navigation">
+          <a class="tabbar__item" href="#top">
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+              <path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"
+                    stroke-linejoin="round" d="M3 10.5 12 3l9 7.5M5 9.5V20h5v-6h4v6h5V9.5"/>
+            </svg>
+            <span>Home</span>
+          </a>
+          <a class="tabbar__item" href="#rsvp">
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+              <path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"
+                    stroke-linejoin="round" d="M20.8 8.6a4.6 4.6 0 0 0-8.8-1.9 4.6 4.6 0 0 0-8.8 1.9c0 4.2 5.2 7.9 8.8 10 3.6-2.1 8.8-5.8 8.8-10Z"/>
+            </svg>
+            <span>RSVP</span>
+          </a>
+          <a class="tabbar__item" href="#gallery">
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+              <path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"
+                    stroke-linejoin="round" d="M4 5h16v14H4zM4 15l4.5-4.5L14 16M14 13l2.5-2.5L20 14M9.5 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"/>
+            </svg>
+            <span>Gallery</span>
+          </a>
+        </nav>
       }
     </div>
   `,
@@ -78,5 +102,12 @@ export class LetterExperience {
     if (index > 0) {
       this.stage.set(STAGE_ORDER[index - 1]);
     }
+  }
+
+  /** Return to the very beginning — the sealed envelope — and stop the music. */
+  protected restart(): void {
+    this.audio.pause();
+    this.stage.set('sealed');
+    window.scrollTo({ top: 0, behavior: 'auto' });
   }
 }
