@@ -9,7 +9,9 @@ DTSTAMP:20260101T000000Z
 DTSTART:20261219T003000Z
 DTEND:20261219T053000Z
 SUMMARY:John Gilfred & Karylle Ann Wedding
-LOCATION:F. Gomez Street\, Brgy. Kanluran\, City of Santa Rosa\, Laguna
-DESCRIPTION:Join us as we celebrate the wedding of John Gilfred & Karylle Ann. Ceremony at Santa Rosa de Lima Parish Church.
+LOCATION:Santa Rosa de Lima Parish Church, Santa Rosa, Laguna
+DESCRIPTION:Celebrate the wedding of John Gilfred & Karylle Ann.
+STATUS:CONFIRMED
+TRANSP:OPAQUE
 END:VEVENT
 END:VCALENDAR
