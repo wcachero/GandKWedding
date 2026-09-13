@@ -236,7 +236,7 @@
         </button>
 
         <!-- Share column -->
-        <button type="button" class="share__card" (click)="shareSite()"
+        <button type="button" class="share__card" (click)="openShare()"
                 aria-label="Share this invitation">
           <span class="share__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="40" height="40">
@@ -258,6 +258,31 @@
   </div>
 </article>
 
+<!-- Share chooser -->
+@if (shareOpen()) {
+  <div class="cal-modal" (click)="closeShare()">
+    <div class="cal-modal__card" (click)="$event.stopPropagation()">
+      <button type="button" class="cal-modal__close" aria-label="Close" (click)="closeShare()">&times;</button>
+      <p class="cal-modal__title">Share Invitation</p>
+      <button type="button" class="btn cal-modal__opt" (click)="copyShareLink()">
+        {{ copied() ? 'Link Copied!' : 'Copy Link' }}
+      </button>
+      <a class="btn cal-modal__opt cal-modal__opt--ghost" [href]="fbShareUrl()" target="_blank" rel="noopener" (click)="pickShare()">
+        Share on Facebook
+      </a>
+      <a class="btn cal-modal__opt cal-modal__opt--ghost" [href]="waShareUrl()" target="_blank" rel="noopener" (click)="pickShare()">
+        Share on WhatsApp
+      </a>
+      @if (canNativeShare()) {
+        <button type="button" class="btn cal-modal__opt cal-modal__opt--ghost" (click)="shareSite()">
+          More apps&hellip;
+        </button>
+      }
+      <p class="cal-modal__url">{{ shareUrl() }}</p>
+    </div>
+  </div>
+}
+
 <!-- Add-to-calendar chooser -->
 @if (calOpen()) {
   <div class="cal-modal" (click)="closeCal()">
@@ -267,12 +292,14 @@
       <a class="btn cal-modal__opt" [href]="googleCalUrl" target="_blank" rel="noopener" (click)="pickCal()">
         Google Calendar
       </a>
-      <a class="btn cal-modal__opt" [href]="icsHref()" rel="noopener" (click)="pickCal()">
-        Apple / Outlook (.ics)
+      <a class="btn cal-modal__opt cal-modal__opt--ghost" href="wedding.ics" rel="noopener" (click)="pickCal()">
+        Apple Calendar (.ics)
       </a>
       <p class="cal-modal__hint">
-        If the file opens as text, tap the browser menu (&#8943;) and choose
-        &ldquo;Open in Safari/Chrome&rdquo;.
+        <strong>Google Calendar</strong> works in one tap.<br>
+        For <strong>Apple Calendar</strong> on iPhone: if it opens as text,
+        press &amp; hold the button and choose &ldquo;Add to Calendar&rdquo;
+        (or open this page in Safari).
       </p>
     </div>
   </div>

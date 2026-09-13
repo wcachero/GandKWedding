@@ -984,6 +984,15 @@
     width: 100%;
 
     & + & { margin-top: var(--space-3); }
+
+    &--ghost {
+      background: transparent;
+      color: var(--color-maroon);
+      border: 1px solid var(--color-maroon);
+      box-shadow: none;
+
+      &:hover { background: var(--color-maroon); color: #fff; }
+    }
   }
 
   &__hint {
@@ -991,6 +1000,13 @@
     font-size: 0.8rem;
     line-height: 1.5;
     color: var(--color-text-muted);
+  }
+
+  &__url {
+    margin-top: var(--space-4);
+    font-size: 0.78rem;
+    color: var(--color-accent-deep);
+    word-break: break-all;
   }
 }
 

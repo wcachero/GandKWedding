@@ -7,7 +7,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import QRCode from 'qrcode';
 import { WEDDING, WeddingEvent } from '../../data/wedding';
 import { Reveal } from '../../directives/reveal';
@@ -94,6 +94,20 @@ export class WeddingInvitation {
   /** Rolling hint under the Share tile ("Tap to share" → "Link copied!"). */
   protected readonly shareHint = signal('Tap to share');
 
+  /** Whether the share chooser is open, and whether the link was just copied. */
+  protected readonly shareOpen = signal(false);
+  protected readonly copied = signal(false);
+  /** True when the browser exposes the native share sheet. */
+  protected readonly canNativeShare = signal(false);
+
+  /** Social share links, built from the resolved page URL. */
+  protected readonly fbShareUrl = computed(
+    () => `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(this.shareUrl())}`,
+  );
+  protected readonly waShareUrl = computed(
+    () => `https://wa.me/?text=${encodeURIComponent("You're invited! " + this.shareUrl())}`,
+  );
+
   /** Venue map currently open in the modal, or null when closed. */
   protected readonly activeMap = signal<{
     name: string;
@@ -120,17 +134,7 @@ export class WeddingInvitation {
     afterNextRender(() => {
       const url = `${window.location.origin}/`;
       this.shareUrl.set(url);
-
-      // iOS: webcal:// opens the Calendar app on a single tap (even inside
-      // Messenger's in-app browser, where an https .ics only renders as text).
-      const isIos =
-        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-      if (isIos) {
-        this.icsHref.set(
-          this.sanitizer.bypassSecurityTrustUrl(`webcal://${window.location.host}/wedding.ics`),
-        );
-      }
+      this.canNativeShare.set(typeof navigator !== 'undefined' && !!navigator.share);
       QRCode.toDataURL(url, {
         errorCorrectionLevel: 'H', // high recovery so the centre badge is safe
         margin: 1,
@@ -148,6 +152,26 @@ export class WeddingInvitation {
 
   protected closeQr(): void {
     this.qrOpen.set(false);
+  }
+
+  protected openShare(): void {
+    this.copied.set(false);
+    this.shareOpen.set(true);
+  }
+
+  protected closeShare(): void {
+    this.shareOpen.set(false);
+  }
+
+  /** Close the chooser after the browser has followed the share link. */
+  protected pickShare(): void {
+    setTimeout(() => this.shareOpen.set(false), 600);
+  }
+
+  /** Copy the invitation link and reflect it in the chooser. */
+  protected async copyShareLink(): Promise<void> {
+    const ok = await this.copyLink(this.shareUrl() || window.location.href);
+    this.copied.set(ok);
   }
 
   /** Share via the native share sheet (mobile), falling back to clipboard copy. */
@@ -242,13 +266,6 @@ export class WeddingInvitation {
 
   /** Whether the "Add to Calendar" chooser is open. */
   protected readonly calOpen = signal(false);
-
-  /**
-   * Link for the .ics option. On iOS the webcal:// scheme is handed straight
-   * to the Calendar app (a normal tap on an https .ics only shows raw text
-   * inside in-app browsers like Messenger). Other platforms use the https file.
-   */
-  protected readonly icsHref = signal<string | SafeUrl>('wedding.ics');
 
   protected openCal(): void {
     this.calOpen.set(true);
