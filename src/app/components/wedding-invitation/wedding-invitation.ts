@@ -149,17 +149,52 @@ export class WeddingInvitation {
     };
     const nav = window.navigator as Navigator & {
       share?: (data: ShareData) => Promise<void>;
+      canShare?: (data: ShareData) => boolean;
     };
-    try {
-      if (nav.share) {
+
+    // 1) Native share sheet, when available and willing to accept the data.
+    if (nav.share && (!nav.canShare || nav.canShare(shareData))) {
+      try {
         await nav.share(shareData);
         this.shareHint.set('Thanks for sharing!');
-      } else {
-        await navigator.clipboard.writeText(url);
-        this.shareHint.set('Link copied!');
+        return;
+      } catch (err) {
+        // User cancelled — stop quietly. Any other error → fall back to copy.
+        if ((err as Error)?.name === 'AbortError') return;
+      }
+    }
+
+    // 2) Copy the link (async clipboard, then legacy execCommand as a fallback).
+    const copied = await this.copyLink(url);
+    this.shareHint.set(copied ? 'Link copied!' : url);
+  }
+
+  /** Copy text to the clipboard, with a legacy fallback for older webviews. */
+  private async copyLink(text: string): Promise<boolean> {
+    try {
+      if (window.isSecureContext && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        return true;
       }
     } catch {
-      // User dismissed the share sheet, or clipboard was blocked — ignore.
+      // fall through to the legacy path
+    }
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '-1000px';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      ta.setSelectionRange(0, text.length);
+      const ok = document.execCommand('copy');
+      ta.remove();
+      return ok;
+    } catch {
+      return false;
     }
   }
 
