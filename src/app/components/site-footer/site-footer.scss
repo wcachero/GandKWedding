@@ -1,0 +1,93 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.footer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: clamp(4rem, 10vw, 7rem) var(--space-6) var(--space-8);
+  margin-top: var(--space-16); /* extra breathing room before the footer */
+  background: linear-gradient(160deg, #fbe1de 0%, #f6c3c0 55%, #f0aab0 100%);
+
+  &__inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    max-width: 640px;
+  }
+
+  &__message {
+    font-family: var(--font-heading);
+    font-size: clamp(1.15rem, 1rem + 0.6vw, 1.4rem);
+    font-style: italic;
+    line-height: 1.7;
+    color: var(--color-text);
+    margin-bottom: var(--space-6);
+
+    strong { font-style: normal; font-weight: 600; color: var(--color-accent-deep); }
+  }
+
+  &__socials {
+    list-style: none;
+    padding: 0;
+    margin-bottom: var(--space-4);
+    display: flex;
+    gap: var(--space-3);
+  }
+
+  &__social {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: var(--color-accent-contrast);
+    background: var(--color-accent);
+    transition: transform 0.2s ease, filter 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+    }
+
+    &:focus-visible {
+      outline: 3px solid var(--color-maroon);
+      outline-offset: 3px;
+    }
+  }
+
+  &__logo {
+    width: 64px;
+    height: auto;
+    margin-bottom: var(--space-1);
+    /* Darken the gold so it reads clearly on the light pink gradient */
+    filter: brightness(0.5) saturate(1.4) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
+  }
+
+  &__brand {
+    font-family: var(--font-script);
+    font-size: 1.8rem;
+    color: var(--color-accent-deep);
+  }
+
+  &__tagline {
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-size: var(--fs-300);
+    color: var(--color-maroon);
+  }
+
+  &__copyright {
+    margin-top: var(--space-3);
+    font-family: var(--font-ui);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    color: var(--color-text-muted);
+  }
+}

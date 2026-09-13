@@ -1,0 +1,63 @@
+:host {
+  display: block;
+}
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  text-align: center;
+}
+
+.envelope {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  width: min(80vw, 480px);
+  transition: transform 0.35s ease;
+
+  &__art {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 18px 30px rgba(120, 0, 20, 0.25));
+  }
+
+  .letter {
+    transform-box: fill-box;
+    transform-origin: center bottom;
+    animation: rise 0.7s ease both;
+  }
+
+  &:hover .letter,
+  &:focus-visible .letter {
+    transform: translateY(-8px);
+    transition: transform 0.3s ease;
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-maroon);
+    outline-offset: 8px;
+    border-radius: var(--radius);
+  }
+}
+
+.stage__hint {
+  font-family: var(--font-body);
+  font-size: var(--fs-400);
+  font-weight: 600;
+  color: var(--color-maroon);
+}
+
+@keyframes rise {
+  from { transform: translateY(26px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .envelope,
+  .envelope .letter {
+    transition: none;
+    animation: none;
+  }
+}
