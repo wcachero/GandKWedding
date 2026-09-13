@@ -31,11 +31,13 @@
 
   &__title {
     text-align: center;
-    font-family: var(--font-display); /* Cinzel Decorative — ornate, cinematic */
-    text-transform: uppercase;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    font-size: clamp(1.5rem, 0.95rem + 2vw, 2.5rem);
+    /* Great Vibes script — matches the "Dear Family & Friends" accent */
+    font-family: var(--font-script);
+    text-transform: none;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    line-height: 1.1;
+    font-size: clamp(2.4rem, 1.6rem + 3vw, 3.6rem);
     color: var(--color-maroon);
     margin-bottom: var(--space-8);
   }
@@ -262,7 +264,7 @@
     flex-direction: column;
     text-shadow: 0 2px 20px rgba(0, 0, 0, 0.35);
 
-    .hero__amp { font-size: 0.5em; opacity: 0.9; margin-block: -0.15em; }
+    .hero__amp { font-size: 0.5em; opacity: 0.9; margin-block: 0.12em; }
   }
 
   &__date {
@@ -489,7 +491,8 @@
     position: absolute;
     inset: 0;
     z-index: 1;
-    background: linear-gradient(to bottom, rgba(35, 22, 16, 0.5), rgba(35, 22, 16, 0.62));
+    /* Warm maroon/terracotta wash to match the theme (was near-black) */
+    background: linear-gradient(to bottom, rgba(94, 70, 53, 0.42), rgba(124, 33, 48, 0.52));
   }
 
   &__content {
@@ -894,6 +897,59 @@
 }
 
 @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+/* ----- Map modal ---------------------------------------------------------- */
+.map-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+  background: rgba(30, 16, 10, 0.88);
+  animation: fade-in 0.2s ease both;
+
+  &__card {
+    position: relative;
+    width: min(94vw, 720px);
+    padding: clamp(1.25rem, 4vw, 2rem);
+    background: var(--color-surface);
+    border-radius: 18px;
+    box-shadow: var(--shadow-md);
+    text-align: center;
+  }
+
+  &__close {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-3);
+    width: 40px;
+    height: 40px;
+    border: 0;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  &__title {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: clamp(1.3rem, 1rem + 1.2vw, 1.8rem);
+    color: var(--color-maroon);
+    margin: var(--space-2) var(--space-6) var(--space-4);
+  }
+
+  &__frame {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    margin-bottom: var(--space-6);
+
+    iframe { display: block; width: 100%; height: min(60vh, 420px); border: 0; }
+  }
+}
 
 /* ----- Lightbox ----------------------------------------------------------- */
 .lightbox {

@@ -94,6 +94,13 @@ export class WeddingInvitation {
   /** Rolling hint under the Share tile ("Tap to share" → "Link copied!"). */
   protected readonly shareHint = signal('Tap to share');
 
+  /** Venue map currently open in the modal, or null when closed. */
+  protected readonly activeMap = signal<{
+    name: string;
+    embed: SafeResourceUrl;
+    link: string;
+  } | null>(null);
+
   /** Photo currently open in the lightbox, or null when closed. */
   protected readonly lightboxPhoto = signal<string | null>(null);
 
@@ -165,6 +172,14 @@ export class WeddingInvitation {
       ),
       mapLink: `https://www.google.com/maps/search/?api=1&query=${q}`,
     };
+  }
+
+  protected openMap(event: EventView): void {
+    this.activeMap.set({ name: event.venue, embed: event.mapEmbed, link: event.mapLink });
+  }
+
+  protected closeMap(): void {
+    this.activeMap.set(null);
   }
 
   protected openLightbox(photo: string): void {

@@ -37,44 +37,6 @@
     </a>
   </header>
 
-  <!-- Share the invitation: QR code + share link -->
-  <section class="section share">
-    <div class="container">
-      <p class="section__label" appReveal>Spread the joy</p>
-      <h2 class="section__title" [appReveal]="60">Share Our Invitation</h2>
-      <div class="share__grid" appReveal>
-        <!-- QR column -->
-        <button type="button" class="share__card" (click)="openQr()"
-                aria-label="Show the QR code for this invitation">
-          <span class="share__qr">
-            @if (qrDataUrl(); as qr) {
-              <img [src]="qr" alt="QR code linking to this invitation" />
-              <span class="share__qr-badge">{{ qrBadge }}</span>
-            } @else {
-              <span class="share__qr-skeleton"></span>
-            }
-          </span>
-          <span class="share__card-title">Scan QR Code</span>
-          <span class="share__card-hint">Tap to enlarge</span>
-        </button>
-
-        <!-- Share column -->
-        <button type="button" class="share__card" (click)="shareSite()"
-                aria-label="Share this invitation">
-          <span class="share__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="40" height="40">
-              <path fill="none" stroke="currentColor" stroke-width="1.8"
-                    stroke-linecap="round" stroke-linejoin="round"
-                    d="M18 8a3 3 0 1 0-2.83-4M18 8a3 3 0 0 1-2.83-2M18 8l-9 4m9 8a3 3 0 1 0-2.83-4M18 20a3 3 0 0 1-2.83-2M18 20l-9-4M9 12a3 3 0 1 0-6 0 3 3 0 0 0 6 0Z"/>
-            </svg>
-          </span>
-          <span class="share__card-title">Share Link</span>
-          <span class="share__card-hint">{{ shareHint() }}</span>
-        </button>
-      </div>
-    </div>
-  </section>
-
   <!-- Intro / date -->
   <section class="section intro" id="details">
     <div class="intro__florals" aria-hidden="true">
@@ -139,13 +101,7 @@
         <h3 class="venue-parallax__name">{{ ceremony.venue }}</h3>
         <p class="venue-parallax__meta">{{ ceremony.time }}</p>
         <p class="venue-parallax__meta">{{ ceremony.address }}</p>
-        <a class="btn" [href]="ceremony.mapLink" target="_blank" rel="noopener">Click here for map</a>
-      </div>
-    </div>
-    <div class="container venue__after">
-      <div class="venue__map" appReveal>
-        <iframe [src]="ceremony.mapEmbed" [title]="ceremony.venue + ' map'"
-                loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <button type="button" class="btn" (click)="openMap(ceremony)">View Map</button>
       </div>
     </div>
 
@@ -158,13 +114,7 @@
         <h3 class="venue-parallax__name">{{ reception.venue }}</h3>
         <p class="venue-parallax__meta">{{ reception.time }}</p>
         <p class="venue-parallax__meta">{{ reception.address }}</p>
-        <a class="btn" [href]="reception.mapLink" target="_blank" rel="noopener">Click here for map</a>
-      </div>
-    </div>
-    <div class="container venue__after">
-      <div class="venue__map" appReveal>
-        <iframe [src]="reception.mapEmbed" [title]="reception.venue + ' map'"
-                loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <button type="button" class="btn" (click)="openMap(reception)">View Map</button>
       </div>
     </div>
   </section>
@@ -251,11 +201,66 @@
     </div>
   </section>
 
+  <div class="divider" aria-hidden="true"><img src="images/flourish.svg" alt="" appReveal /></div>
+
+  <!-- Share the invitation: QR code + share link -->
+  <section class="section share">
+    <div class="container">
+      <p class="section__label" appReveal>Spread the joy</p>
+      <h2 class="section__title" [appReveal]="60">Share Our Invitation</h2>
+      <div class="share__grid" appReveal>
+        <!-- QR column -->
+        <button type="button" class="share__card" (click)="openQr()"
+                aria-label="Show the QR code for this invitation">
+          <span class="share__qr">
+            @if (qrDataUrl(); as qr) {
+              <img [src]="qr" alt="QR code linking to this invitation" />
+              <span class="share__qr-badge">{{ qrBadge }}</span>
+            } @else {
+              <span class="share__qr-skeleton"></span>
+            }
+          </span>
+          <span class="share__card-title">Scan QR Code</span>
+          <span class="share__card-hint">Tap to enlarge</span>
+        </button>
+
+        <!-- Share column -->
+        <button type="button" class="share__card" (click)="shareSite()"
+                aria-label="Share this invitation">
+          <span class="share__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="40" height="40">
+              <path fill="none" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round"
+                    d="M18 8a3 3 0 1 0-2.83-4M18 8a3 3 0 0 1-2.83-2M18 8l-9 4m9 8a3 3 0 1 0-2.83-4M18 20a3 3 0 0 1-2.83-2M18 20l-9-4M9 12a3 3 0 1 0-6 0 3 3 0 0 0 6 0Z"/>
+            </svg>
+          </span>
+          <span class="share__card-title">Share Link</span>
+          <span class="share__card-hint">{{ shareHint() }}</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
   <!-- Floral separator before the footer -->
   <div class="floral-sep" aria-hidden="true">
     <img src="images/floral-divider.svg" alt="" appReveal />
   </div>
 </article>
+
+<!-- Map modal -->
+@if (activeMap(); as map) {
+  <div class="map-modal" (click)="closeMap()">
+    <div class="map-modal__card" (click)="$event.stopPropagation()">
+      <button type="button" class="map-modal__close" aria-label="Close" (click)="closeMap()">&times;</button>
+      <h3 class="map-modal__title">{{ map.name }}</h3>
+      <div class="map-modal__frame">
+        <iframe [src]="map.embed" [title]="map.name + ' map'"
+                loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+      <a class="btn" [href]="map.link" target="_blank" rel="noopener">Open in Google Maps</a>
+    </div>
+  </div>
+}
 
 <!-- QR modal -->
 @if (qrOpen()) {
