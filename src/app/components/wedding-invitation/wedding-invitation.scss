@@ -795,7 +795,7 @@
   min-height: clamp(70vh, 74vh, 860px);
   display: grid;
   place-items: end center;
-  margin-bottom: 0;
+  margin-bottom: var(--space-3);
   text-align: center;
 
   &__bg {
@@ -827,30 +827,30 @@
       );
   }
 
-  /* Champagne liquid glass — lighter transparency + shadowed text */
+  /* Champagne liquid glass — high transparency */
   &__content {
     position: relative;
     z-index: 2;
     isolation: isolate;
     overflow: hidden;
     width: min(92vw, 38rem);
-    margin-bottom: clamp(3.25rem, 10vh, 5.5rem);
-    padding: clamp(1.5rem, 4.5vw, 2.35rem) clamp(1.25rem, 4vw, 2.25rem);
+    margin-bottom: clamp(6.5rem, 18vh, 10rem);
+    padding: clamp(1.5rem, 4.5vw, 2.35rem) clamp(1.25rem, 4vw, 2.25rem) clamp(2.5rem, 6vw, 3.25rem);
     color: #2f1a12;
     border-radius: 16px;
-    border: 1px solid rgba(195, 164, 107, 0.32);
+    border: 1px solid rgba(195, 164, 107, 0.16);
     background: linear-gradient(
       165deg,
-      rgba(255, 248, 239, 0.22) 0%,
-      rgba(231, 216, 188, 0.16) 42%,
-      rgba(195, 164, 107, 0.14) 100%
+      rgba(255, 248, 239, 0.05) 0%,
+      rgba(231, 216, 188, 0.03) 42%,
+      rgba(195, 164, 107, 0.03) 100%
     );
     box-shadow:
-      inset 0 1px 0 rgba(255, 248, 239, 0.4),
-      inset 0 -1px 0 rgba(195, 164, 107, 0.1),
-      0 10px 28px rgba(62, 36, 22, 0.12);
-    backdrop-filter: blur(14px) saturate(1.25);
-    -webkit-backdrop-filter: blur(14px) saturate(1.25);
+      inset 0 1px 0 rgba(255, 248, 239, 0.18),
+      inset 0 -1px 0 rgba(195, 164, 107, 0.04),
+      0 6px 18px rgba(62, 36, 22, 0.06);
+    backdrop-filter: blur(8px) saturate(1.1);
+    -webkit-backdrop-filter: blur(8px) saturate(1.1);
 
     &::before {
       content: '';
@@ -861,16 +861,16 @@
       background:
         linear-gradient(
           115deg,
-          rgba(255, 248, 239, 0.18) 0%,
-          rgba(231, 216, 188, 0.06) 30%,
+          rgba(255, 248, 239, 0.06) 0%,
+          rgba(231, 216, 188, 0.02) 30%,
           transparent 55%,
-          rgba(195, 164, 107, 0.08) 100%
+          rgba(195, 164, 107, 0.03) 100%
         ),
         linear-gradient(
           90deg,
           transparent 0%,
-          rgba(255, 248, 239, 0.12) 42%,
-          rgba(195, 164, 107, 0.08) 50%,
+          rgba(255, 248, 239, 0.04) 42%,
+          rgba(195, 164, 107, 0.03) 50%,
           transparent 58%
         );
       background-size: 100% 100%, 220% 100%;
@@ -883,9 +883,16 @@
     }
   }
 
-  /* Ceremony plate sits higher in the frame */
-  &--ceremony &__content {
-    margin-bottom: clamp(5.5rem, 16vh, 8.5rem);
+  /* Ceremony + reception: liquid glass vertically centered on the photo */
+  &--ceremony,
+  &--reception {
+    place-items: center;
+
+    .venue-parallax__content {
+      margin-bottom: 0;
+      margin-top: 0;
+      padding-bottom: clamp(2.75rem, 7vw, 3.75rem);
+    }
   }
 
   &__name {
@@ -895,12 +902,14 @@
     text-transform: uppercase;
     letter-spacing: 0.28em;
     font-size: clamp(0.95rem, 0.85rem + 0.45vw, 1.1rem);
-    line-height: 1.45;
-    margin: var(--space-3) 0 var(--space-3);
+    line-height: 1.55;
+    margin: var(--space-5) 0 var(--space-5);
     color: #2f1a12;
     text-shadow:
-      0 1px 2px rgba(255, 248, 239, 0.55),
-      0 2px 10px rgba(40, 24, 14, 0.35);
+      0 0 10px rgba(227, 163, 121, 0.75),
+      0 0 22px rgba(227, 163, 121, 0.55),
+      0 0 36px rgba(227, 163, 121, 0.35),
+      0 1px 2px rgba(255, 248, 239, 0.4);
   }
 
   &__meta {
@@ -911,11 +920,13 @@
     letter-spacing: 0.22em;
     color: #2f1a12;
     font-size: clamp(0.78rem, 0.72rem + 0.3vw, 0.9rem);
-    line-height: 1.65;
-    margin-bottom: var(--space-2);
+    line-height: 1.75;
+    margin-bottom: var(--space-5);
     text-shadow:
-      0 1px 2px rgba(255, 248, 239, 0.5),
-      0 2px 8px rgba(40, 24, 14, 0.3);
+      0 0 10px rgba(227, 163, 121, 0.7),
+      0 0 20px rgba(227, 163, 121, 0.5),
+      0 0 32px rgba(227, 163, 121, 0.3),
+      0 1px 2px rgba(255, 248, 239, 0.35);
     opacity: 1;
 
     & + .btn { margin-top: var(--space-5, 1.25rem); }
@@ -929,9 +940,12 @@
     text-transform: uppercase;
     color: #2f1a12;
     opacity: 1;
+    margin-bottom: var(--space-4);
     text-shadow:
-      0 1px 2px rgba(255, 248, 239, 0.5),
-      0 2px 8px rgba(40, 24, 14, 0.3);
+      0 0 10px rgba(227, 163, 121, 0.7),
+      0 0 20px rgba(227, 163, 121, 0.5),
+      0 0 32px rgba(227, 163, 121, 0.3),
+      0 1px 2px rgba(255, 248, 239, 0.35);
   }
 
   .btn {
