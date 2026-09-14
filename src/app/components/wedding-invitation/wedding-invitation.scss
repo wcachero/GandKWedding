@@ -323,17 +323,17 @@
     background:
       linear-gradient(
         180deg,
-        rgba(28, 16, 12, 0.42) 0%,
-        rgba(28, 16, 12, 0.12) 16%,
-        transparent 36%,
-        transparent 64%,
-        rgba(28, 16, 12, 0.16) 82%,
-        rgba(28, 16, 12, 0.46) 100%
+        rgba(227, 163, 121, 0.32) 0%,
+        rgba(227, 163, 121, 0.1) 16%,
+        transparent 38%,
+        transparent 62%,
+        rgba(227, 163, 121, 0.14) 82%,
+        rgba(227, 163, 121, 0.36) 100%
       ),
       radial-gradient(
         ellipse 90% 72% at 50% 42%,
         transparent 48%,
-        rgba(18, 10, 8, 0.28) 100%
+        rgba(227, 163, 121, 0.22) 100%
       );
     pointer-events: none;
   }
@@ -370,6 +370,7 @@
     text-align: center;
     color: #fff;
     padding: var(--space-6);
+    transform: translateY(clamp(2rem, 7vh, 4.5rem));
   }
 
   /* After the banner fades in, each line rises from the bottom in sequence */
