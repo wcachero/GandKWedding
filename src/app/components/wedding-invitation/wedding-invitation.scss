@@ -375,16 +375,16 @@
 
   /* After the banner fades in, each line rises from the bottom in sequence */
   &__kicker,
-  &__names span,
+  &__name-in,
   &__date {
     animation: line-up 0.9s cubic-bezier(0.2, 0.75, 0.25, 1) both;
   }
 
   &__kicker { animation-delay: 1.5s; }
-  &__name--groom { animation-delay: 2.5s; }
-  &__amp { animation-delay: 2.7s; }
-  &__name--bride { animation-delay: 2.9s; }
-  &__date { animation-delay: 3.4s; }  /* extra ~0.5s pause before the date */
+  &__name--groom .hero__name-in { animation-delay: 2.5s; }
+  &__amp .hero__name-in { animation-delay: 2.7s; }
+  &__name--bride .hero__name-in { animation-delay: 2.9s; }
+  &__date { animation-delay: 3.5s; }  /* extra ~0.5s pause before the date */
 
   &__kicker {
     position: absolute;
@@ -480,11 +480,17 @@
       font-size: clamp(2.35rem, 11.5vw, 3.1rem);
       line-height: 0.92;
 
-      span {
-        animation: none;
+      .hero__name--groom,
+      .hero__amp,
+      .hero__name--bride {
         position: absolute;
         display: block;
         white-space: nowrap;
+      }
+
+      .hero__name-in {
+        display: block;
+        position: static;
       }
 
       .hero__name--groom {
@@ -1307,6 +1313,6 @@
   .lightbox { animation: none; }
   .hero__scroll span { animation: none; }
   .hero__bg, .hero__bg-img, .hero::before, .hero::after { animation: none; }
-  .hero__kicker, .hero__names span, .hero__date { animation: none; }
+  .hero__kicker, .hero__name-in, .hero__date { animation: none; }
   .gallery__item img { transition: none; }
 }
