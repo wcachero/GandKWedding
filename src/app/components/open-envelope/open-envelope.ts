@@ -10,7 +10,7 @@ import {
 
 /**
  * Stage 2 — the opened envelope with the letter peeking out.
- * Emits `read` when the user taps the letter, or automatically after 6s
+ * Emits `read` when the user taps the letter, or automatically after 5s
  * with a “letter sliding out” animation.
  */
 @Component({
@@ -24,7 +24,7 @@ import {
         [class.envelope--reveal]="revealing()"
         aria-label="Read the letter"
         (click)="openNow()">
-        <svg class="envelope__art" viewBox="0 50 520 380" role="img" aria-hidden="true">
+        <svg class="envelope__art" viewBox="70 50 380 372" role="img" aria-hidden="true">
           <defs>
             <linearGradient id="openBody" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stop-color="#d4bc8a" />
@@ -75,7 +75,7 @@ export class OpenEnvelope {
 
   constructor() {
     afterNextRender(() => {
-      this.waitTimer = setTimeout(() => this.startReveal(), 6000);
+      this.waitTimer = setTimeout(() => this.startReveal(), 3400);
     });
 
     this.destroyRef.onDestroy(() => this.clearTimers());

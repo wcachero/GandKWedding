@@ -6,25 +6,32 @@
 .stage {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 0.2rem;
+  align-items: stretch;
+  width: min(72vw, 400px);
+  gap: 0.25rem;
 
   &__hint {
     margin: 0;
+    width: 100%;
     font-family: var(--font-ui);
     text-transform: uppercase;
-    letter-spacing: 0.16em;
-    font-size: 0.92rem;
-    font-weight: 700;
+    letter-spacing: 0.1em;
+    font-size: clamp(0.62rem, 2.4vw, 0.72rem);
+    font-weight: 500;
     color: #fff8ef;
-    text-align: right;
-    max-width: min(72vw, 400px);
+    text-align: center;
     text-shadow:
-      0 0 6px #3d2418,
-      0 0 12px #3d2418,
-      0 0 22px rgba(61, 36, 24, 0.95),
-      0 0 36px rgba(61, 36, 24, 0.75),
-      0 2px 4px #2a1810;
+      0 1px 2px #2a1810,
+      0 0 8px #3d2418,
+      0 0 16px rgba(61, 36, 24, 0.95),
+      0 2px 10px rgba(8, 6, 4, 0.7);
+    animation: sealed-hint-fade 0.85s ease 1.9s both;
+
+    @media (max-width: 768px) {
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+    }
   }
 }
 
@@ -32,9 +39,10 @@
   border: 0;
   padding: 0;
   background: transparent;
-  width: min(72vw, 400px);
+  width: 100%;
   border-radius: var(--radius);
   transition: transform 0.35s ease, filter 0.35s ease;
+  animation: sealed-env-fade 0.85s ease 1.9s both;
 
   &__art {
     width: 100%;
@@ -57,8 +65,65 @@
   }
 }
 
+@media (min-width: 769px) {
+  :host {
+    width: 100%;
+  }
+
+  .stage {
+    width: 100%;
+    max-width: none;
+    margin-inline: auto;
+    gap: 0.08rem;
+  }
+
+  .stage__hint {
+    font-size: 1.05rem;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 540px) {
+  :host {
+    width: auto;
+  }
+
+  .stage {
+    width: min(50vh, 280px);
+    gap: 0.1rem;
+  }
+
+  .stage__hint {
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .envelope {
     transition: none;
+  }
+
+  .stage__hint,
+  .envelope {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+@keyframes sealed-env-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes sealed-hint-fade {
+  from {
+    opacity: 0;
+    transform: translateY(0.4rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
