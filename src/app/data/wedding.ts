@@ -55,7 +55,7 @@ export const WEDDING: Wedding = {
   dateIso: '2026-12-19T08:30:00+08:00',
   dateShort: '12.19.26',
   dateLong: { month: 'December', monthShort: 'Dec', day: '19', year: '2026', weekday: 'Saturday' },
-  ceremonyTime: '8:30 AM Ceremony',
+  ceremonyTime: 'Ceremony',
   heroPhoto: 'images/couple-hero.jpg',
   saveTheDatePhoto: 'images/save-the-date.jpg',
   gallery: Array.from(
