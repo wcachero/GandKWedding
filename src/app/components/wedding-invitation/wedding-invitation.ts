@@ -2,7 +2,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  ElementRef,
   HostListener,
+  Injector,
   afterNextRender,
   computed,
   inject,
@@ -42,6 +44,8 @@ interface EventView extends WeddingEvent {
 export class WeddingInvitation {
   private readonly sanitizer = inject(DomSanitizer);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly host = inject(ElementRef<HTMLElement>);
+  private readonly injector = inject(Injector);
   protected readonly wedding = WEDDING;
 
   /** Same mark as `.nav__logo`, burned into the centre of the QR at a scan-safe size. */
@@ -79,42 +83,124 @@ export class WeddingInvitation {
   /** True while the guest is scrolling down — bar slides away until idle or scroll-up. */
   protected readonly navHidden = signal(false);
 
-  /** Gallery carousel index and whether the full album is expanded. */
-  protected readonly galleryIndex = signal(0);
+  /** Whether the full metro tile album is expanded. */
   protected readonly galleryExpanded = signal(false);
-  private readonly galleryWindow = 3;
+  private readonly galleryPreviewCount = 8;
 
   protected readonly gallerySlides = computed(() => {
     const all = this.wedding.gallery;
     if (this.galleryExpanded()) {
       return all;
     }
-    const n = all.length;
-    const start = ((this.galleryIndex() % n) + n) % n;
-    return Array.from({ length: Math.min(this.galleryWindow, n) }, (_, i) => all[(start + i) % n]);
+    return all.slice(0, this.galleryPreviewCount);
   });
 
   protected readonly galleryHasMore = computed(
-    () => !this.galleryExpanded() && this.wedding.gallery.length > this.galleryWindow,
+    () => !this.galleryExpanded() && this.wedding.gallery.length > this.galleryPreviewCount,
   );
 
-  protected galleryPrev(): void {
-    const n = this.wedding.gallery.length;
-    this.galleryIndex.update((i) => (i - 1 + n) % n);
+  protected readonly galleryCanCollapse = computed(() => this.galleryExpanded());
+
+  /** Per-photo object-position, filled when faces can be detected. */
+  private readonly galleryFocus = signal<ReadonlyMap<string, string>>(new Map());
+
+  /** Photos whose tile image has finished loading (or failed). */
+  private readonly galleryLoaded = signal<ReadonlySet<string>>(new Set());
+
+  protected galleryImageReady(photo: string): boolean {
+    return this.galleryLoaded().has(photo);
   }
 
-  protected galleryNext(): void {
-    const n = this.wedding.gallery.length;
-    this.galleryIndex.update((i) => (i + 1) % n);
+  protected galleryObjectPosition(photo: string): string {
+    return this.galleryFocus().get(photo) ?? 'center 22%';
+  }
+
+  protected onGalleryImageLoad(photo: string, event: Event): void {
+    this.markGalleryLoaded(photo);
+    void this.focusGalleryPerson(photo, event.target as HTMLImageElement);
+  }
+
+  protected onGalleryImageError(photo: string): void {
+    this.markGalleryLoaded(photo);
+  }
+
+  private markGalleryLoaded(photo: string): void {
+    if (this.galleryLoaded().has(photo)) {
+      return;
+    }
+    this.galleryLoaded.update((set) => new Set(set).add(photo));
+  }
+
+  /** Mark tiles already in browser cache so skeletons clear immediately. */
+  private hydrateGalleryImageStates(): void {
+    const imgs = this.host.nativeElement.querySelectorAll(
+      '.gallery__tile img',
+    ) as NodeListOf<HTMLImageElement>;
+    imgs.forEach((img) => {
+      if (!img.complete || img.naturalWidth <= 0) {
+        return;
+      }
+      const photo = img.getAttribute('src');
+      if (photo) {
+        this.markGalleryLoaded(photo);
+      }
+    });
+  }
+
+  private async focusGalleryPerson(photo: string, img: HTMLImageElement): Promise<void> {
+    if (this.galleryFocus().has(photo)) {
+      return;
+    }
+    const FaceDetectorCtor = (
+      window as Window & {
+        FaceDetector?: new (options?: { fastMode?: boolean; maxDetectedFaces?: number }) => {
+          detect(image: HTMLImageElement): Promise<readonly { boundingBox: DOMRectReadOnly }[]>;
+        };
+      }
+    ).FaceDetector;
+    if (!FaceDetectorCtor) {
+      return;
+    }
+    try {
+      const detector = new FaceDetectorCtor({ fastMode: true, maxDetectedFaces: 4 });
+      const faces = await detector.detect(img);
+      if (!faces.length || !img.naturalWidth || !img.naturalHeight) {
+        return;
+      }
+
+      let minX = Number.POSITIVE_INFINITY;
+      let minY = Number.POSITIVE_INFINITY;
+      let maxX = Number.NEGATIVE_INFINITY;
+      let maxY = Number.NEGATIVE_INFINITY;
+      for (const face of faces) {
+        const box = face.boundingBox;
+        minX = Math.min(minX, box.x);
+        minY = Math.min(minY, box.y);
+        maxX = Math.max(maxX, box.x + box.width);
+        maxY = Math.max(maxY, box.y + box.height);
+      }
+
+      const cx = (((minX + maxX) / 2) / img.naturalWidth) * 100;
+      // Bias a little above face center so hairline/forehead stays in frame.
+      const cy = Math.max(8, (((minY + maxY) / 2) / img.naturalHeight) * 100 - 6);
+      const position = `${cx.toFixed(1)}% ${cy.toFixed(1)}%`;
+      this.galleryFocus.update((map) => new Map(map).set(photo, position));
+    } catch {
+      /* Keep the CSS person-biased fallback. */
+    }
   }
 
   protected expandGallery(): void {
     this.galleryExpanded.set(true);
+    afterNextRender(() => this.hydrateGalleryImageStates(), { injector: this.injector });
+  }
+
+  protected collapseGallery(): void {
+    this.galleryExpanded.set(false);
   }
 
   private pointerX = 0;
   private pointerY = 0;
-  private skipGalleryClick = false;
   private skipLightboxClose = false;
 
   protected onPointerDown(event: PointerEvent): void {
@@ -125,27 +211,7 @@ export class WeddingInvitation {
     this.pointerY = event.clientY;
   }
 
-  protected onGalleryPointerUp(event: PointerEvent): void {
-    if (this.galleryExpanded()) {
-      return;
-    }
-    const dir = this.swipeDirection(event);
-    if (!dir) {
-      return;
-    }
-    this.skipGalleryClick = true;
-    if (dir === 'left') {
-      this.galleryNext();
-    } else {
-      this.galleryPrev();
-    }
-  }
-
   protected openGalleryPhoto(photo: string): void {
-    if (this.skipGalleryClick) {
-      this.skipGalleryClick = false;
-      return;
-    }
     this.openLightbox(photo);
   }
 
@@ -375,6 +441,7 @@ export class WeddingInvitation {
     // (window is unavailable during prerendering).
     afterNextRender(() => {
       this.setupAutoHideNav();
+      this.hydrateGalleryImageStates();
 
       const url = `${window.location.origin}/`;
       this.shareUrl.set(url);

@@ -34,7 +34,8 @@ export interface Wedding {
   readonly reception: WeddingEvent;
   readonly dressCode: {
     readonly title: string;
-    readonly image: string;
+    readonly ladiesImage: string;
+    readonly gentlemenImage: string;
     readonly swatches: readonly DressSwatch[];
     readonly note: string;
   };
@@ -81,7 +82,8 @@ export const WEDDING: Wedding = {
   },
   dressCode: {
     title: 'Semi-Formal Attire',
-    image: 'images/dresscode.jpg',
+    ladiesImage: 'images/attire-ladies.jpg',
+    gentlemenImage: 'images/attire-gentlemen.jpg',
     swatches: [
       { name: 'Warm Peach', color: 'var(--swatch-warm-peach)' },
       { name: 'Soft Blush', color: 'var(--swatch-soft-blush)' },
@@ -94,7 +96,7 @@ export const WEDDING: Wedding = {
     url: 'https://script.google.com/macros/s/AKfycbzJQmmnqci0N9stgHUoOX-v8p6mzRAyy82rrWXM1H-_45GBf2OdveebLXvxQTR9WKeJ/exec',
     note: 'Every seat is reserved with love and intention. Kindly confirm your attendance below.',
     contacts: [
-      { name: 'Karylle', phone: '0926 851 9693' },
+      { name: 'Karyle', phone: '0926 851 9693' },
       { name: 'Gilfred', phone: '0995 927 9620' },
     ],
     reservedNote:

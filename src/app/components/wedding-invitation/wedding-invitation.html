@@ -142,11 +142,28 @@
     <div class="container">
       <p class="section__label" appReveal>Dress Code</p>
       <h2 class="section__title" [appReveal]="60">{{ wedding.dressCode.title }}</h2>
-      <button type="button" class="attire__image-btn" [appReveal]="120"
-              (click)="openLightbox(wedding.dressCode.image)" aria-label="Enlarge attire guide">
-        <img class="attire__image" [src]="wedding.dressCode.image"
-             alt="Attire guide for ladies and gentlemen" loading="lazy" />
-      </button>
+
+      <div class="attire__grid" appReveal>
+        <figure class="attire__panel">
+          <figcaption class="attire__caption">For Ladies</figcaption>
+          <button type="button" class="attire__card"
+                  (click)="openLightbox(wedding.dressCode.ladiesImage)"
+                  aria-label="Enlarge ladies attire guide">
+            <img class="attire__image" [src]="wedding.dressCode.ladiesImage"
+                 alt="Attire guide for ladies" loading="lazy" />
+          </button>
+        </figure>
+        <figure class="attire__panel">
+          <figcaption class="attire__caption">For Gentlemen</figcaption>
+          <button type="button" class="attire__card"
+                  (click)="openLightbox(wedding.dressCode.gentlemenImage)"
+                  aria-label="Enlarge gentlemen attire guide">
+            <img class="attire__image" [src]="wedding.dressCode.gentlemenImage"
+                 alt="Attire guide for gentlemen" loading="lazy" />
+          </button>
+        </figure>
+      </div>
+
       <ul class="swatches" appReveal>
         @for (s of wedding.dressCode.swatches; track s.name; let i = $index) {
           <li class="swatch" [appReveal]="i * 90">
@@ -177,37 +194,40 @@
       <p class="section__label" appReveal>A glimpse of our story</p>
       <h2 class="section__title" [appReveal]="60">Our Moments</h2>
 
-      <div class="gallery__stage" [class.gallery__stage--grid]="galleryExpanded()">
-        @if (!galleryExpanded()) {
-          <button type="button" class="gallery__nav gallery__nav--prev"
-                  aria-label="Previous photos" (click)="galleryPrev()">
-            <span aria-hidden="true">‹</span>
-          </button>
-        }
-
-        <div class="gallery__window"
-             (pointerdown)="onPointerDown($event)"
-             (pointerup)="onGalleryPointerUp($event)">
-          @for (photo of gallerySlides(); track photo; let i = $index) {
-            <button type="button" class="gallery__item" (click)="openGalleryPhoto(photo)">
-              <img [src]="photo" alt="Gilfred and Karyle" loading="lazy" decoding="async" />
-            </button>
-          }
-        </div>
-
-        @if (!galleryExpanded()) {
-          <button type="button" class="gallery__nav gallery__nav--next"
-                  aria-label="Next photos" (click)="galleryNext()">
-            <span aria-hidden="true">›</span>
+      <div class="gallery__tiles" appReveal>
+        @for (photo of gallerySlides(); track photo; let i = $index) {
+          <button type="button"
+                  class="gallery__tile"
+                  [class.gallery__tile--loading]="!galleryImageReady(photo)"
+                  [attr.data-tile]="(i % 8) + 1"
+                  [attr.aria-busy]="!galleryImageReady(photo)"
+                  (click)="openGalleryPhoto(photo)">
+            <span class="gallery__skeleton" aria-hidden="true"></span>
+            <img [src]="photo"
+                 alt="Gilfred and Karyle"
+                 loading="lazy"
+                 decoding="async"
+                 [class.gallery__img--ready]="galleryImageReady(photo)"
+                 [style.object-position]="galleryObjectPosition(photo)"
+                 [style.transform-origin]="galleryObjectPosition(photo)"
+                 (load)="onGalleryImageLoad(photo, $event)"
+                 (error)="onGalleryImageError(photo)" />
           </button>
         }
       </div>
 
-      @if (galleryHasMore()) {
-        <button type="button" class="btn gallery__more" (click)="expandGallery()">
-          See more
-        </button>
-      }
+      <div class="gallery__actions">
+        @if (galleryHasMore()) {
+          <button type="button" class="btn gallery__more" (click)="expandGallery()">
+            See more
+          </button>
+        }
+        @if (galleryCanCollapse()) {
+          <button type="button" class="btn gallery__more gallery__more--ghost" (click)="collapseGallery()">
+            Show less
+          </button>
+        }
+      </div>
     </div>
   </section>
 

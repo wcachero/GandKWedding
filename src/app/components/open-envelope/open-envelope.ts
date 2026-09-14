@@ -49,7 +49,7 @@ import {
             <rect x="126" y="86" width="268" height="270" rx="6" fill="#f7f4ec"
                   stroke="#e6ddcd" stroke-width="1" />
             <text text-anchor="middle" font-family="'Great Vibes', cursive" fill="#5e4635">
-              <tspan x="260" y="146" font-size="34">Gilfred &amp; Karylle</tspan>
+              <tspan x="260" y="146" font-size="34">Gilfred &amp; Karyle</tspan>
               <tspan x="260" y="188" font-size="34">Wedding</tspan>
             </text>
           </g>

@@ -1,12 +1,26 @@
 :host {
   display: block;
+  position: relative;
+  z-index: 6;
+  will-change: transform;
+}
+
+:host(.music-disc--dragging) {
+  z-index: 40;
 }
 
 .player {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-2);
+  gap: 0.35rem;
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
+
+  :host(.music-disc--dragging) & {
+    cursor: grabbing;
+  }
 
   &__disc {
     padding: 0;
@@ -14,13 +28,15 @@
     background: transparent;
     line-height: 0;
     border-radius: 50%;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     transition: transform 0.2s ease;
+    cursor: inherit;
 
     img {
-      width: clamp(64px, 12vw, 92px);
+      width: clamp(40px, 7.5vw, 52px);
       height: auto;
       border-radius: 50%;
+      pointer-events: none;
     }
 
     &:hover {
@@ -37,12 +53,44 @@
     }
   }
 
+  /* One-line marquee for both states; nav/footer bronze type. */
   &__label {
-    font-family: var(--font-body);
-    font-size: var(--fs-100);
-    font-weight: 600;
-    color: var(--color-maroon);
+    position: relative;
+    overflow: hidden;
     text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.68rem;
+    font-weight: 500;
+    font-style: normal;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    color: #fff;
+    line-height: 1.2;
+    width: calc(clamp(40px, 7.5vw, 52px) + 30px);
+    max-width: calc(clamp(40px, 7.5vw, 52px) + 30px);
+    white-space: nowrap;
+    padding: 0.25rem 0.3rem;
+    border-radius: 6px;
+    background: radial-gradient(
+      ellipse 82% 78% at 50% 50%,
+      rgba(227, 163, 121, 0.3) 0%,
+      rgba(227, 163, 121, 0.18) 48%,
+      rgba(227, 163, 121, 0.06) 70%,
+      rgba(227, 163, 121, 0) 100%
+    );
+    box-shadow: none;
+  }
+
+  &__marquee {
+    display: inline-flex;
+    width: max-content;
+    gap: 2.25rem;
+    animation: player-marquee 9s linear infinite;
+    will-change: transform;
+
+    span {
+      flex: 0 0 auto;
+    }
   }
 }
 
@@ -51,17 +99,35 @@
   to   { transform: rotate(360deg); }
 }
 
+@keyframes player-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .player__disc--spinning img {
     animation: none;
   }
+
+  .player__marquee {
+    animation: none;
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 :host-context(.scene[data-stage='open']) .player__disc img {
-  width: clamp(40px, 7vw, 52px);
+  width: clamp(32px, 5.5vw, 40px);
+}
+
+:host-context(.scene[data-stage='open']) .player__label {
+  width: calc(clamp(32px, 5.5vw, 40px) + 30px);
+  max-width: calc(clamp(32px, 5.5vw, 40px) + 30px);
 }
 
 :host-context(.scene[data-stage='reading']) .player__label {
-  color: #5e4635;
+  color: #fff;
   text-shadow: none;
 }

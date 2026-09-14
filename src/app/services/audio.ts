@@ -10,6 +10,9 @@ export class AudioService {
   private audio?: HTMLAudioElement;
   readonly playing = signal(false);
 
+  /** Shown in the disc label while music is playing. */
+  readonly trackTitle = 'When God Made You';
+
   private ensure(): HTMLAudioElement {
     if (!this.audio) {
       const el = new Audio('audio/song.mp3');

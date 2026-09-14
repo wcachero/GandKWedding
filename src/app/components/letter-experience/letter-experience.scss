@@ -335,7 +335,7 @@
   position: fixed;
   bottom: clamp(var(--space-4), 3vw, var(--space-8));
   right: clamp(var(--space-4), 3vw, var(--space-8));
-  z-index: 5;
+  z-index: 35;
 }
 
 .scene[data-stage='open'] .scene__music {
