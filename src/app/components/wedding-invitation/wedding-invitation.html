@@ -256,8 +256,7 @@
                 aria-label="Show the QR code for this invitation">
           <span class="share__qr">
             @if (qrDataUrl(); as qr) {
-              <img [src]="qr" alt="QR code linking to this invitation" />
-              <span class="share__qr-badge">{{ qrBadge }}</span>
+              <img class="share__qr-code" [src]="qr" alt="QR code linking to this invitation" />
             } @else {
               <span class="share__qr-skeleton"></span>
             }
@@ -359,8 +358,7 @@
       <p class="qr-modal__names">{{ wedding.groom }} &amp; {{ wedding.bride }}</p>
       <div class="qr-modal__qr">
         @if (qrDataUrl(); as qr) {
-          <img [src]="qr" alt="QR code linking to this invitation" />
-          <span class="qr-modal__badge">{{ qrBadge }}</span>
+          <img class="qr-modal__code" [src]="qr" alt="QR code linking to this invitation" />
         }
       </div>
       <p class="qr-modal__hint">Scan to open this invitation</p>
@@ -389,9 +387,17 @@
         <span aria-hidden="true">›</span>
       </button>
     }
-    <img [src]="photo" alt="Engagement photo enlarged"
-         (click)="$event.stopPropagation()"
-         (pointerdown)="onPointerDown($event)"
-         (pointerup)="onLightboxPointerUp($event)" />
+    <div class="lightbox__stage" (click)="$event.stopPropagation()">
+      <img class="lightbox__img"
+           [class.lightbox__img--zoomed]="lightboxZoom() > 1"
+           [src]="photo"
+           alt="Engagement photo enlarged"
+           [style.transform]="lightboxImageTransform()"
+           (click)="onLightboxImageTap($event)"
+           (pointerdown)="onLightboxImagePointerDown($event)"
+           (pointermove)="onLightboxImagePointerMove($event)"
+           (pointerup)="onLightboxImagePointerUp($event)"
+           (pointercancel)="onLightboxImagePointerUp($event)" />
+    </div>
   </div>
 }

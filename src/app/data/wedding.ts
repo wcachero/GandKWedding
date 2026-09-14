@@ -57,18 +57,10 @@ export const WEDDING: Wedding = {
   ceremonyTime: '8:30 AM Ceremony',
   heroPhoto: 'images/couple-hero.jpg',
   saveTheDatePhoto: 'images/save-the-date.jpg',
-  gallery: [
-    'images/gallery/g01.jpg',
-    'images/gallery/g02.jpg',
-    'images/gallery/g03.jpg',
-    'images/gallery/g04.jpg',
-    'images/gallery/g05.jpg',
-    'images/gallery/g06.jpg',
-    'images/gallery/g07.jpg',
-    'images/gallery/g08.jpg',
-    'images/gallery/g09.jpg',
-    'images/gallery/g10.jpg',
-  ],
+  gallery: Array.from(
+    { length: 64 },
+    (_, i) => `images/gallery/g${String(i + 1).padStart(2, '0')}.jpg`,
+  ),
   ceremony: {
     title: 'Santa Rosa de Lima Parish Church',
     kicker: 'The Ceremony',

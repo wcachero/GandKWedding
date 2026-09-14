@@ -44,6 +44,9 @@ export class WeddingInvitation {
   private readonly destroyRef = inject(DestroyRef);
   protected readonly wedding = WEDDING;
 
+  /** Same mark as `.nav__logo`, burned into the centre of the QR at a scan-safe size. */
+  private static readonly QR_LOGO = 'images/gk-nav-logo.png';
+
   protected readonly ceremony = this.toEventView(WEDDING.ceremony);
   protected readonly reception = this.toEventView(WEDDING.reception);
 
@@ -157,6 +160,7 @@ export class WeddingInvitation {
       return;
     }
     const n = this.wedding.gallery.length;
+    this.resetLightboxZoom();
     this.lightboxPhoto.set(this.wedding.gallery[(i - 1 + n) % n]);
   }
 
@@ -166,10 +170,14 @@ export class WeddingInvitation {
       return;
     }
     const n = this.wedding.gallery.length;
+    this.resetLightboxZoom();
     this.lightboxPhoto.set(this.wedding.gallery[(i + 1) % n]);
   }
 
   protected onLightboxPointerUp(event: PointerEvent): void {
+    if (this.lightboxZoom() > 1) {
+      return;
+    }
     if (!this.lightboxCanBrowse()) {
       return;
     }
@@ -229,9 +237,6 @@ export class WeddingInvitation {
     this.menuOpen.set(false);
   }
 
-  /** Short monogram (no spaces) shown in the centre of the QR code. */
-  protected readonly qrBadge = WEDDING.monogram.replace(/\s+/g, '');
-
   /** Public URL of this invitation, resolved in the browser. */
   protected readonly shareUrl = signal('');
 
@@ -268,6 +273,92 @@ export class WeddingInvitation {
   /** Photo currently open in the lightbox, or null when closed. */
   protected readonly lightboxPhoto = signal<string | null>(null);
 
+  protected readonly lightboxZoom = signal(1);
+  private readonly lightboxPan = signal({ x: 0, y: 0 });
+  private lightboxPanning = false;
+  private lightboxPanStart = { x: 0, y: 0, panX: 0, panY: 0 };
+  private lightboxDidPan = false;
+
+  protected readonly lightboxImageTransform = computed(() => {
+    const z = this.lightboxZoom();
+    const { x, y } = this.lightboxPan();
+    return `translate(${x}px, ${y}px) scale(${z})`;
+  });
+
+  protected toggleLightboxZoom(event?: Event): void {
+    event?.stopPropagation();
+    if (this.lightboxZoom() > 1) {
+      this.resetLightboxZoom();
+    } else {
+      this.lightboxZoom.set(2.5);
+    }
+  }
+
+  protected onLightboxImageTap(event: MouseEvent): void {
+    event.stopPropagation();
+    if (this.skipLightboxClose) {
+      this.skipLightboxClose = false;
+      return;
+    }
+    if (this.lightboxDidPan) {
+      this.lightboxDidPan = false;
+      return;
+    }
+    this.toggleLightboxZoom();
+  }
+
+  protected onLightboxImagePointerDown(event: PointerEvent): void {
+    if (this.lightboxZoom() > 1) {
+      event.stopPropagation();
+      this.lightboxPanning = true;
+      const pan = this.lightboxPan();
+      this.lightboxPanStart = {
+        x: event.clientX,
+        y: event.clientY,
+        panX: pan.x,
+        panY: pan.y,
+      };
+      (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+      return;
+    }
+    this.onPointerDown(event);
+  }
+
+  protected onLightboxImagePointerMove(event: PointerEvent): void {
+    if (!this.lightboxPanning) {
+      return;
+    }
+    event.stopPropagation();
+    const dx = event.clientX - this.lightboxPanStart.x;
+    const dy = event.clientY - this.lightboxPanStart.y;
+    if (Math.hypot(dx, dy) > 8) {
+      this.lightboxDidPan = true;
+    }
+    this.lightboxPan.set({
+      x: this.lightboxPanStart.panX + dx,
+      y: this.lightboxPanStart.panY + dy,
+    });
+  }
+
+  protected onLightboxImagePointerUp(event: PointerEvent): void {
+    if (this.lightboxPanning) {
+      this.lightboxPanning = false;
+      try {
+        (event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId);
+      } catch {
+        /* already released */
+      }
+      return;
+    }
+    this.onLightboxPointerUp(event);
+  }
+
+  private resetLightboxZoom(): void {
+    this.lightboxZoom.set(1);
+    this.lightboxPan.set({ x: 0, y: 0 });
+    this.lightboxPanning = false;
+  }
+
   /** Venue photos that failed to load, so their <img> can be hidden. */
   protected readonly failedPhotos = signal<ReadonlySet<string>>(new Set());
 
@@ -287,14 +378,64 @@ export class WeddingInvitation {
       const url = `${window.location.origin}/`;
       this.shareUrl.set(url);
       this.canNativeShare.set(typeof navigator !== 'undefined' && !!navigator.share);
-      QRCode.toDataURL(url, {
-        errorCorrectionLevel: 'H', // high recovery so the centre badge is safe
-        margin: 1,
-        width: 640,
-        color: { dark: '#6b3b2e', light: '#ffffff' },
-      })
+      this.buildBrandedQrDataUrl(url)
         .then((data) => this.qrDataUrl.set(data))
         .catch(() => this.qrDataUrl.set(null));
+    });
+  }
+
+  /** QR with nav logo composited in the centre (high error correction). */
+  private buildBrandedQrDataUrl(url: string): Promise<string> {
+    return QRCode.toDataURL(url, {
+      errorCorrectionLevel: 'H',
+      margin: 2,
+      width: 640,
+      color: { dark: '#6b3b2e', light: '#ffffff' },
+    }).then((qrData) => this.compositeQrLogo(qrData, WeddingInvitation.QR_LOGO));
+  }
+
+  private compositeQrLogo(qrDataUrl: string, logoSrc: string): Promise<string> {
+    return new Promise((resolve) => {
+      const qr = new Image();
+      qr.onload = () => {
+        const logo = new Image();
+        logo.onload = () => {
+          const size = qr.width;
+          const canvas = document.createElement('canvas');
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            resolve(qrDataUrl);
+            return;
+          }
+          ctx.drawImage(qr, 0, 0);
+
+          const maxLogoW = size * 0.36;
+          const maxLogoH = size * 0.13;
+          const scale = Math.min(maxLogoW / logo.width, maxLogoH / logo.height);
+          const logoW = logo.width * scale;
+          const logoH = logo.height * scale;
+          const pad = size * 0.028;
+          const boxW = logoW + pad * 2;
+          const boxH = logoH + pad * 2;
+          const boxX = (size - boxW) / 2;
+          const boxY = (size - boxH) / 2;
+          const radius = size * 0.022;
+
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.roundRect(boxX, boxY, boxW, boxH, radius);
+          ctx.fill();
+          ctx.drawImage(logo, (size - logoW) / 2, (size - logoH) / 2, logoW, logoH);
+
+          resolve(canvas.toDataURL('image/png'));
+        };
+        logo.onerror = () => resolve(qrDataUrl);
+        logo.src = logoSrc;
+      };
+      qr.onerror = () => resolve(qrDataUrl);
+      qr.src = qrDataUrl;
     });
   }
 
@@ -453,10 +594,12 @@ export class WeddingInvitation {
   }
 
   protected openLightbox(photo: string): void {
+    this.resetLightboxZoom();
     this.lightboxPhoto.set(photo);
   }
 
   protected closeLightbox(): void {
+    this.resetLightboxZoom();
     this.lightboxPhoto.set(null);
   }
 
