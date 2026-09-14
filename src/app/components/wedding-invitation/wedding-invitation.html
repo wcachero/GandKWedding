@@ -1,6 +1,11 @@
 <!-- Sticky navigation -->
-<nav class="nav" [class.nav--open]="menuOpen()">
-  <a class="nav__brand" href="#top" (click)="closeMenu()">{{ wedding.monogram }}<span class="nav__brand-word">Wedding</span></a>
+<nav class="nav"
+     [class.nav--open]="menuOpen()"
+     [class.nav--hidden]="navHidden()"
+     [attr.aria-hidden]="navHidden() ? true : null">
+  <a class="nav__brand" href="#top" (click)="closeMenu()">
+    <img class="nav__logo" src="images/gk-nav-logo.png" alt="Gilfred &amp; Karyle — 12.19.2026" />
+  </a>
 
   <button type="button" class="nav__toggle" [attr.aria-expanded]="menuOpen()"
           aria-label="Toggle menu" (click)="toggleMenu()">

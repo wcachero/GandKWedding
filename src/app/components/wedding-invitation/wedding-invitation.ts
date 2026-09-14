@@ -40,6 +40,7 @@ interface EventView extends WeddingEvent {
 })
 export class WeddingInvitation {
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly destroyRef = inject(DestroyRef);
   protected readonly wedding = WEDDING;
 
   protected readonly ceremony = this.toEventView(WEDDING.ceremony);
@@ -71,8 +72,16 @@ export class WeddingInvitation {
   /** Mobile nav (hamburger) open state. */
   protected readonly menuOpen = signal(false);
 
+  /** True while the guest is scrolling down — bar slides away until idle or scroll-up. */
+  protected readonly navHidden = signal(false);
+
   protected toggleMenu(): void {
-    this.menuOpen.update((open) => !open);
+    this.menuOpen.update((open) => {
+      if (!open) {
+        this.navHidden.set(false);
+      }
+      return !open;
+    });
   }
 
   protected closeMenu(): void {
@@ -127,11 +136,13 @@ export class WeddingInvitation {
 
   constructor() {
     const id = setInterval(() => this.now.set(Date.now()), 1000);
-    inject(DestroyRef).onDestroy(() => clearInterval(id));
+    this.destroyRef.onDestroy(() => clearInterval(id));
 
     // Resolve the live URL and render the QR code only in the browser
     // (window is unavailable during prerendering).
     afterNextRender(() => {
+      this.setupAutoHideNav();
+
       const url = `${window.location.origin}/`;
       this.shareUrl.set(url);
       this.canNativeShare.set(typeof navigator !== 'undefined' && !!navigator.share);
@@ -231,6 +242,54 @@ export class WeddingInvitation {
     } catch {
       return false;
     }
+  }
+
+  /**
+   * Hide the sticky bar while scrolling down, reveal it on scroll-up,
+   * and always bring it back after 5s without further scroll.
+   */
+  private setupAutoHideNav(): void {
+    const IDLE_MS = 5000;
+    const DELTA = 8;
+    let lastY = window.scrollY;
+    let idleId: ReturnType<typeof setTimeout> | null = null;
+
+    const showNav = () => this.navHidden.set(false);
+
+    const onScroll = () => {
+      const y = Math.max(0, window.scrollY);
+      const delta = y - lastY;
+      lastY = y;
+
+      if (idleId !== null) {
+        clearTimeout(idleId);
+      }
+      idleId = setTimeout(showNav, IDLE_MS);
+
+      if (this.menuOpen()) {
+        showNav();
+        return;
+      }
+
+      if (y < 12) {
+        showNav();
+        return;
+      }
+
+      if (delta > DELTA) {
+        this.navHidden.set(true);
+      } else if (delta < -DELTA) {
+        showNav();
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    this.destroyRef.onDestroy(() => {
+      window.removeEventListener('scroll', onScroll);
+      if (idleId !== null) {
+        clearTimeout(idleId);
+      }
+    });
   }
 
   private toEventView(event: WeddingEvent): EventView {

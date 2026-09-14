@@ -74,75 +74,43 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  padding: var(--space-3) clamp(1rem, 4vw, 2.5rem);
+  padding: 0.45rem clamp(1rem, 4vw, 2.5rem);
   isolation: isolate;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 248, 230, 0.38) 0%,
-    rgba(195, 164, 107, 0.62) 48%,
-    rgba(169, 129, 42, 0.55) 100%
-  );
-  backdrop-filter: blur(28px) saturate(1.85);
-  -webkit-backdrop-filter: blur(28px) saturate(1.85);
-  border-bottom: 1px solid rgba(255, 248, 230, 0.42);
+  background: #e7d8bc;
+  border-bottom: 2px solid #e3a379;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.58),
-    inset 0 -1px 0 rgba(61, 36, 24, 0.14),
-    0 10px 32px rgba(18, 14, 8, 0.16);
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 8px 24px rgba(18, 14, 8, 0.12);
+  transform: translateY(0);
+  transition: transform 0.35s ease;
 
-  &::before,
-  &::after {
-    content: "";
-    position: absolute;
+  &.nav--hidden {
+    transform: translateY(-100%);
     pointer-events: none;
   }
 
-  &::before {
-    inset: 0;
-    z-index: -1;
-    background:
-      linear-gradient(
-        115deg,
-        rgba(255, 255, 255, 0.42) 0%,
-        rgba(255, 255, 255, 0.1) 22%,
-        transparent 46%,
-        rgba(195, 164, 107, 0.18) 100%
-      ),
-      linear-gradient(
-        90deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.22) 42%,
-        rgba(255, 248, 230, 0.08) 50%,
-        transparent 58%
-      );
-    background-size: 100% 100%, 220% 100%;
-    animation: nav-liquid-shine 9s ease-in-out infinite;
-  }
-
-  &::after {
-    left: 10%;
-    right: 10%;
-    top: 0;
-    height: 1px;
-    z-index: 1;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.72),
-      transparent
-    );
-  }
-
   &__brand {
-    font-family: var(--font-script);
-    font-size: 1.8rem;
-    line-height: 1;
-    color: #3d2418;
-    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    line-height: 0;
+    flex: 0 1 auto;
+    min-width: 0;
   }
 
-  &__brand-word {
-    margin-left: 0.5em; /* extra space between "G & K" and "Wedding" */
+  &__logo {
+    display: block;
+    height: 4.75rem;
+    width: auto;
+    max-width: min(58vw, 17rem);
+    object-fit: contain;
+    object-position: left center;
+    background: transparent;
+    filter: drop-shadow(0 1px 1px rgba(61, 36, 24, 0.18));
+
+    @media (max-width: 680px) {
+      height: 3.85rem;
+      max-width: min(62vw, 14rem);
+    }
   }
 
   &__toggle {
@@ -161,7 +129,7 @@
       height: 2px;
       width: 100%;
       border-radius: 2px;
-      background: #3d2418;
+      background: #c3a46b;
       transition: transform 0.3s ease, opacity 0.2s ease;
     }
   }
@@ -177,12 +145,50 @@
     font-size: 0.72rem;
 
     a {
-      color: #3d2418;
-      padding-bottom: 2px;
-      border-bottom: 1px solid transparent;
-      transition: color 0.2s ease, border-color 0.2s ease;
+      position: relative;
+      color: #6e5224;
+      padding-bottom: 5px;
+      text-shadow:
+        0 0 4px rgba(255, 248, 230, 0.55),
+        0 0 12px rgba(110, 82, 36, 0.5);
+      transition:
+        color 0.25s ease,
+        text-shadow 0.25s ease,
+        transform 0.25s ease;
 
-      &:hover { color: #2a1810; border-color: #2a1810; }
+      &::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: 0;
+        width: 100%;
+        height: 1.5px;
+        border-radius: 1px;
+        background: #6e5224;
+        box-shadow: 0 0 8px rgba(110, 82, 36, 0.55);
+        transform: translateX(-50%) scaleX(0);
+        transform-origin: center;
+        transition: transform 0.28s ease, background-color 0.25s ease;
+      }
+
+      &:hover,
+      &:focus-visible {
+        color: #4f3a18;
+        transform: translateY(-1px);
+        text-shadow:
+          0 0 6px rgba(255, 248, 230, 0.85),
+          0 0 16px rgba(110, 82, 36, 0.7),
+          0 0 26px rgba(169, 129, 42, 0.45);
+
+        &::after {
+          transform: translateX(-50%) scaleX(1);
+          background: #4f3a18;
+        }
+      }
+
+      &:focus-visible {
+        outline: none;
+      }
     }
   }
 
@@ -199,18 +205,26 @@
       align-items: center;
       gap: var(--space-4);
       padding: var(--space-6);
+      isolation: isolate;
       background: linear-gradient(
         180deg,
-        rgba(255, 248, 230, 0.34) 0%,
-        rgba(195, 164, 107, 0.7) 100%
+        rgba(255, 248, 230, 0.42) 0%,
+        rgba(231, 216, 188, 0.55) 48%,
+        rgba(195, 164, 107, 0.38) 100%
       );
       backdrop-filter: blur(28px) saturate(1.85);
       -webkit-backdrop-filter: blur(28px) saturate(1.85);
-      border-bottom: 1px solid rgba(255, 248, 230, 0.42);
+      border-bottom: 1px solid rgba(255, 248, 230, 0.45);
       box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.4),
-        0 16px 36px rgba(18, 14, 8, 0.2);
-      font-size: 0.9rem;
+        inset 0 1px 0 rgba(255, 255, 255, 0.5),
+        0 16px 36px rgba(18, 14, 8, 0.22);
+      font-size: 0.95rem;
+
+      a {
+        font-weight: 700;
+        color: #6e5224;
+        letter-spacing: 0.16em;
+      }
 
       /* hidden by default */
       opacity: 0;
@@ -225,6 +239,31 @@
       transform: translateY(0);
     }
 
+    &.nav--open .nav__links::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        linear-gradient(
+          115deg,
+          rgba(255, 255, 255, 0.45) 0%,
+          rgba(255, 255, 255, 0.12) 24%,
+          transparent 50%,
+          rgba(195, 164, 107, 0.16) 100%
+        ),
+        linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.28) 42%,
+          rgba(255, 248, 230, 0.1) 50%,
+          transparent 58%
+        );
+      background-size: 100% 100%, 220% 100%;
+      animation: nav-menu-liquid 8s ease-in-out infinite;
+    }
+
     /* hamburger → X */
     &.nav--open .nav__toggle span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
     &.nav--open .nav__toggle span:nth-child(2) { opacity: 0; }
@@ -232,16 +271,20 @@
   }
 }
 
-@keyframes nav-liquid-shine {
-  0%, 100% { background-position: 0% 0%, 0% 0%; }
-  50% { background-position: 0% 0%, 100% 0%; }
+@media (prefers-reduced-motion: reduce) {
+  .nav { transition: none; }
+
+  .nav__toggle span,
+  .nav__links,
+  .nav__links a,
+  .nav__links a::after { transition: none; }
+
+  .nav--open .nav__links::before { animation: none; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .nav__toggle span,
-  .nav__links { transition: none; }
-
-  .nav::before { animation: none; }
+@keyframes nav-menu-liquid {
+  0%, 100% { background-position: 0% 0%, 0% 0%; }
+  50% { background-position: 0% 0%, 100% 0%; }
 }
 
 /* ----- Parallax hero ------------------------------------------------------ */
@@ -276,9 +319,22 @@
   &__scrim {
     position: absolute;
     inset: 0;
+    z-index: 1;
     background:
-      radial-gradient(130% 90% at 50% 22%, transparent 38%, rgba(35, 18, 18, 0.62) 100%),
-      linear-gradient(to bottom, rgba(50, 30, 22, 0.25) 0%, rgba(50, 30, 22, 0.2) 45%, rgba(40, 22, 20, 0.62) 100%);
+      linear-gradient(
+        180deg,
+        rgba(227, 163, 121, 0.52) 0%,
+        rgba(227, 163, 121, 0.18) 22%,
+        rgba(227, 163, 121, 0.06) 48%,
+        rgba(227, 163, 121, 0.24) 78%,
+        rgba(227, 163, 121, 0.5) 100%
+      ),
+      radial-gradient(
+        ellipse 75% 60% at 50% 38%,
+        transparent 0%,
+        rgba(227, 163, 121, 0.34) 100%
+      );
+    pointer-events: none;
   }
 
   /* Two slow-drifting warm glows for a soft, romantic light */
