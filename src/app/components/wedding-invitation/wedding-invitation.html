@@ -185,9 +185,11 @@
           </button>
         }
 
-        <div class="gallery__window">
+        <div class="gallery__window"
+             (pointerdown)="onPointerDown($event)"
+             (pointerup)="onGalleryPointerUp($event)">
           @for (photo of gallerySlides(); track photo; let i = $index) {
-            <button type="button" class="gallery__item" (click)="openLightbox(photo)">
+            <button type="button" class="gallery__item" (click)="openGalleryPhoto(photo)">
               <img [src]="photo" alt="Gilfred and Karyle" loading="lazy" decoding="async" />
             </button>
           }
@@ -369,8 +371,27 @@
 
 <!-- Lightbox -->
 @if (lightboxPhoto(); as photo) {
-  <div class="lightbox" (click)="closeLightbox()">
-    <button type="button" class="lightbox__close" aria-label="Close photo">&times;</button>
-    <img [src]="photo" alt="Engagement photo enlarged" (click)="$event.stopPropagation()" />
+  <div class="lightbox"
+       (click)="onLightboxBackdropClick()"
+       (pointerdown)="onPointerDown($event)"
+       (pointerup)="onLightboxPointerUp($event)">
+    <button type="button" class="lightbox__close" aria-label="Close photo"
+            (click)="$event.stopPropagation(); closeLightbox()">&times;</button>
+    @if (lightboxCanBrowse()) {
+      <button type="button" class="lightbox__nav lightbox__nav--prev"
+              aria-label="Previous photo"
+              (click)="$event.stopPropagation(); lightboxPrev()">
+        <span aria-hidden="true">‹</span>
+      </button>
+      <button type="button" class="lightbox__nav lightbox__nav--next"
+              aria-label="Next photo"
+              (click)="$event.stopPropagation(); lightboxNext()">
+        <span aria-hidden="true">›</span>
+      </button>
+    }
+    <img [src]="photo" alt="Engagement photo enlarged"
+         (click)="$event.stopPropagation()"
+         (pointerdown)="onPointerDown($event)"
+         (pointerup)="onLightboxPointerUp($event)" />
   </div>
 }

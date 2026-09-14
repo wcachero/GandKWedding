@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  HostListener,
   afterNextRender,
   computed,
   inject,
@@ -106,6 +107,113 @@ export class WeddingInvitation {
 
   protected expandGallery(): void {
     this.galleryExpanded.set(true);
+  }
+
+  private pointerX = 0;
+  private pointerY = 0;
+  private skipGalleryClick = false;
+  private skipLightboxClose = false;
+
+  protected onPointerDown(event: PointerEvent): void {
+    if (event.pointerType === 'mouse' && event.button !== 0) {
+      return;
+    }
+    this.pointerX = event.clientX;
+    this.pointerY = event.clientY;
+  }
+
+  protected onGalleryPointerUp(event: PointerEvent): void {
+    if (this.galleryExpanded()) {
+      return;
+    }
+    const dir = this.swipeDirection(event);
+    if (!dir) {
+      return;
+    }
+    this.skipGalleryClick = true;
+    if (dir === 'left') {
+      this.galleryNext();
+    } else {
+      this.galleryPrev();
+    }
+  }
+
+  protected openGalleryPhoto(photo: string): void {
+    if (this.skipGalleryClick) {
+      this.skipGalleryClick = false;
+      return;
+    }
+    this.openLightbox(photo);
+  }
+
+  protected readonly lightboxCanBrowse = computed(() => {
+    const photo = this.lightboxPhoto();
+    return !!photo && this.wedding.gallery.includes(photo);
+  });
+
+  protected lightboxPrev(): void {
+    const i = this.wedding.gallery.indexOf(this.lightboxPhoto() ?? '');
+    if (i < 0) {
+      return;
+    }
+    const n = this.wedding.gallery.length;
+    this.lightboxPhoto.set(this.wedding.gallery[(i - 1 + n) % n]);
+  }
+
+  protected lightboxNext(): void {
+    const i = this.wedding.gallery.indexOf(this.lightboxPhoto() ?? '');
+    if (i < 0) {
+      return;
+    }
+    const n = this.wedding.gallery.length;
+    this.lightboxPhoto.set(this.wedding.gallery[(i + 1) % n]);
+  }
+
+  protected onLightboxPointerUp(event: PointerEvent): void {
+    if (!this.lightboxCanBrowse()) {
+      return;
+    }
+    const dir = this.swipeDirection(event);
+    if (!dir) {
+      return;
+    }
+    this.skipLightboxClose = true;
+    if (dir === 'left') {
+      this.lightboxNext();
+    } else {
+      this.lightboxPrev();
+    }
+  }
+
+  protected onLightboxBackdropClick(): void {
+    if (this.skipLightboxClose) {
+      this.skipLightboxClose = false;
+      return;
+    }
+    this.closeLightbox();
+  }
+
+  private swipeDirection(event: PointerEvent): 'left' | 'right' | null {
+    const dx = event.clientX - this.pointerX;
+    const dy = event.clientY - this.pointerY;
+    if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy) * 1.15) {
+      return null;
+    }
+    return dx < 0 ? 'left' : 'right';
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  protected onDocumentKey(event: KeyboardEvent): void {
+    if (!this.lightboxPhoto()) {
+      return;
+    }
+    if (event.key === 'ArrowLeft') {
+      this.lightboxPrev();
+    } else if (event.key === 'ArrowRight') {
+      this.lightboxNext();
+    } else if (event.key === 'Escape') {
+      this.closeLightbox();
+    }
   }
 
   protected toggleMenu(): void {
