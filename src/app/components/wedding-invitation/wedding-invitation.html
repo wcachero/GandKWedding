@@ -174,14 +174,38 @@
   <!-- Gallery -->
   <section class="section gallery" id="gallery">
     <div class="container">
-      <h2 class="section__title" appReveal>Our Moments</h2>
-      <div class="gallery__grid">
-        @for (photo of wedding.gallery; track photo; let i = $index) {
-          <button type="button" class="gallery__item" [appReveal]="i * 80" (click)="openLightbox(photo)">
-            <img [src]="photo" alt="Engagement photo" loading="lazy" />
+      <p class="section__label" appReveal>A glimpse of our story</p>
+      <h2 class="section__title" [appReveal]="60">Our Moments</h2>
+
+      <div class="gallery__stage" [class.gallery__stage--grid]="galleryExpanded()">
+        @if (!galleryExpanded()) {
+          <button type="button" class="gallery__nav gallery__nav--prev"
+                  aria-label="Previous photos" (click)="galleryPrev()">
+            <span aria-hidden="true">‹</span>
+          </button>
+        }
+
+        <div class="gallery__window">
+          @for (photo of gallerySlides(); track photo; let i = $index) {
+            <button type="button" class="gallery__item" (click)="openLightbox(photo)">
+              <img [src]="photo" alt="Gilfred and Karyle" loading="lazy" decoding="async" />
+            </button>
+          }
+        </div>
+
+        @if (!galleryExpanded()) {
+          <button type="button" class="gallery__nav gallery__nav--next"
+                  aria-label="Next photos" (click)="galleryNext()">
+            <span aria-hidden="true">›</span>
           </button>
         }
       </div>
+
+      @if (galleryHasMore()) {
+        <button type="button" class="btn gallery__more" (click)="expandGallery()">
+          See more
+        </button>
+      }
     </div>
   </section>
 

@@ -75,6 +75,39 @@ export class WeddingInvitation {
   /** True while the guest is scrolling down — bar slides away until idle or scroll-up. */
   protected readonly navHidden = signal(false);
 
+  /** Gallery carousel index and whether the full album is expanded. */
+  protected readonly galleryIndex = signal(0);
+  protected readonly galleryExpanded = signal(false);
+  private readonly galleryWindow = 3;
+
+  protected readonly gallerySlides = computed(() => {
+    const all = this.wedding.gallery;
+    if (this.galleryExpanded()) {
+      return all;
+    }
+    const n = all.length;
+    const start = ((this.galleryIndex() % n) + n) % n;
+    return Array.from({ length: Math.min(this.galleryWindow, n) }, (_, i) => all[(start + i) % n]);
+  });
+
+  protected readonly galleryHasMore = computed(
+    () => !this.galleryExpanded() && this.wedding.gallery.length > this.galleryWindow,
+  );
+
+  protected galleryPrev(): void {
+    const n = this.wedding.gallery.length;
+    this.galleryIndex.update((i) => (i - 1 + n) % n);
+  }
+
+  protected galleryNext(): void {
+    const n = this.wedding.gallery.length;
+    this.galleryIndex.update((i) => (i + 1) % n);
+  }
+
+  protected expandGallery(): void {
+    this.galleryExpanded.set(true);
+  }
+
   protected toggleMenu(): void {
     this.menuOpen.update((open) => {
       if (!open) {

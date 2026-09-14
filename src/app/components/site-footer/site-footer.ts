@@ -2,15 +2,21 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { WEDDING } from '../../data/wedding';
 
 /**
- * Site footer — a photo backdrop with a short brand message, social links,
- * the GW Moments mark, tagline and copyright.
+ * Site footer — champagne and peach close, with florals, socials, and the GW Moments mark.
  */
 @Component({
   selector: 'app-site-footer',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <footer class="footer">
+      <div class="footer__wash" aria-hidden="true"></div>
+      <div class="footer__floral footer__floral--left" aria-hidden="true"></div>
+      <div class="footer__floral footer__floral--right" aria-hidden="true"></div>
+
       <div class="footer__inner">
+        <img class="footer__flourish" src="images/flourish.svg" alt="" />
+
+        <p class="footer__kicker">With love</p>
         <p class="footer__message">
           Thank you for being part of our story. This digital invitation was crafted with love by
           <strong>GW Moments</strong> — for elegant, interactive invitations of your own, we'd be

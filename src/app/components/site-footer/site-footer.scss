@@ -5,38 +5,99 @@
 
 .footer {
   position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: clamp(4rem, 10vw, 7rem) var(--space-6) var(--space-8);
-  margin-top: var(--space-16); /* extra breathing room before the footer */
-  background: linear-gradient(160deg, #fbe1de 0%, #f6c3c0 55%, #f0aab0 100%);
+  padding: clamp(3.5rem, 8vw, 6rem) var(--space-6) clamp(2.5rem, 5vw, 3.5rem);
+  border-top: 2px solid #e3a379;
+  background:
+    linear-gradient(
+      180deg,
+      #f6efe6 0%,
+      #eadcc8 42%,
+      #e7d8bc 78%,
+      #e3c7a4 100%
+    );
+
+  &__wash {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255, 248, 239, 0.7), transparent 62%),
+      radial-gradient(ellipse 70% 40% at 50% 100%, rgba(227, 163, 121, 0.28), transparent 70%);
+  }
+
+  &__floral {
+    position: absolute;
+    z-index: 0;
+    top: 8%;
+    width: min(42vw, 280px);
+    height: 84%;
+    pointer-events: none;
+    background: url("/images/floral-border.png") center / contain no-repeat;
+    opacity: 0.28;
+    filter: sepia(0.25) saturate(0.85);
+
+    &--left {
+      left: -6%;
+      transform: scaleX(-1);
+    }
+
+    &--right {
+      right: -6%;
+    }
+  }
 
   &__inner {
     position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--space-2);
-    max-width: 640px;
+    max-width: 40rem;
+  }
+
+  &__flourish {
+    width: min(88%, 420px);
+    height: auto;
+    margin-bottom: var(--space-6);
+    opacity: 0.9;
+  }
+
+  &__kicker {
+    font-family: var(--font-ui);
+    text-transform: uppercase;
+    letter-spacing: 0.38em;
+    font-size: 0.64rem;
+    color: #6e5224;
+    margin-bottom: var(--space-3);
   }
 
   &__message {
     font-family: var(--font-heading);
-    font-size: clamp(1.15rem, 1rem + 0.6vw, 1.4rem);
+    font-size: clamp(1.12rem, 1rem + 0.5vw, 1.35rem);
     font-style: italic;
-    line-height: 1.7;
-    color: var(--color-text);
-    margin-bottom: var(--space-6);
+    line-height: 1.8;
+    color: #4a3b32;
+    margin-bottom: var(--space-8);
 
-    strong { font-style: normal; font-weight: 600; color: var(--color-accent-deep); }
+    strong {
+      font-style: normal;
+      font-weight: 600;
+      color: #6e5224;
+    }
   }
 
   &__socials {
     list-style: none;
     padding: 0;
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--space-6);
     display: flex;
     gap: var(--space-3);
   }
@@ -44,20 +105,23 @@
   &__social {
     display: grid;
     place-items: center;
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
-    color: var(--color-accent-contrast);
-    background: var(--color-accent);
-    transition: transform 0.2s ease, filter 0.2s ease;
+    color: #6e5224;
+    background: rgba(255, 248, 239, 0.72);
+    border: 1px solid rgba(195, 164, 107, 0.55);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+    transition: transform 0.22s ease, background 0.22s ease, color 0.22s ease;
 
     &:hover {
       transform: translateY(-2px);
-      filter: brightness(1.08);
+      background: #fff8ef;
+      color: #4f3a18;
     }
 
     &:focus-visible {
-      outline: 3px solid var(--color-maroon);
+      outline: 3px solid #c3a46b;
       outline-offset: 3px;
     }
   }
@@ -66,28 +130,37 @@
     width: 64px;
     height: auto;
     margin-bottom: var(--space-1);
-    /* Darken the gold so it reads clearly on the light pink gradient */
-    filter: brightness(0.5) saturate(1.4) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
+    filter: drop-shadow(0 1px 2px rgba(94, 70, 53, 0.2));
   }
 
   &__brand {
     font-family: var(--font-script);
-    font-size: 1.8rem;
-    color: var(--color-accent-deep);
+    font-size: 2rem;
+    color: #5e4635;
+    line-height: 1.1;
   }
 
   &__tagline {
     font-family: var(--font-heading);
     font-style: italic;
     font-size: var(--fs-300);
-    color: var(--color-maroon);
+    color: #6e5c4e;
   }
 
   &__copyright {
-    margin-top: var(--space-3);
+    margin-top: var(--space-4);
     font-family: var(--font-ui);
-    font-size: 0.72rem;
-    letter-spacing: 0.08em;
-    color: var(--color-text-muted);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #6e5224;
+    opacity: 0.85;
+  }
+}
+
+@media (max-width: 680px) {
+  .footer__floral {
+    opacity: 0.18;
+    width: min(56vw, 200px);
   }
 }

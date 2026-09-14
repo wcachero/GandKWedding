@@ -324,7 +324,7 @@
     place-items: initial;
     padding: 0;
     overflow: visible;
-    background: #edc4a4;
+    background: #f6efe6;
 
     .scene__content { display: block; }
     .scene__footer { margin-top: 0; }
@@ -425,8 +425,9 @@
 }
 
 .scene[data-stage='reading'] .overscroll-hint {
-  color: #6b5a4c;
-  background: #e3a379;
+  color: #6e5224;
+  background: #e7d8bc;
+  border-top: 1px solid rgba(227, 163, 121, 0.65);
 }
 
 .scene[data-stage='reading'] .tabbar {
