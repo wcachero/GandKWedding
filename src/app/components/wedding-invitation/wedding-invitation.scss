@@ -381,14 +381,15 @@
   }
 
   &__kicker { animation-delay: 1.5s; }
-  &__names span:nth-child(1) { animation-delay: 2.5s; }  /* ~1s pause before the names */
-  &__names span:nth-child(2) { animation-delay: 2.7s; }  /* the ampersand */
-  &__names span:nth-child(3) { animation-delay: 2.9s; }
+  &__name--groom { animation-delay: 2.5s; }
+  &__amp { animation-delay: 2.7s; }
+  &__name--bride { animation-delay: 2.9s; }
   &__date { animation-delay: 3.4s; }  /* extra ~0.5s pause before the date */
 
   &__kicker {
     position: absolute;
     top: clamp(2rem, 8vh, 5rem);
+    margin-top: 0.75rem;
     left: 0;
     right: 0;
     z-index: 2;
@@ -448,6 +449,65 @@
       background: #fff;
       border-radius: 2px;
       animation: scroll-dot 1.6s ease-in-out infinite;
+    }
+  }
+
+  @media (max-width: 680px) {
+    &__bg-img {
+      animation: none;
+      background-position: 50% 16%;
+    }
+
+    &__kicker {
+      top: 1.35rem;
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+      letter-spacing: 0.34em;
+    }
+
+    &__content {
+      position: absolute;
+      inset: 0;
+      transform: none;
+      padding: 0;
+      pointer-events: none;
+    }
+
+    &__names {
+      position: absolute;
+      inset: 0;
+      display: block;
+      font-size: clamp(2.35rem, 11.5vw, 3.1rem);
+      line-height: 0.92;
+
+      span {
+        animation: none;
+        position: absolute;
+        display: block;
+        white-space: nowrap;
+      }
+
+      .hero__name--groom {
+        top: 16%;
+        left: 63%;
+        transform: translateX(-50%);
+        font-size: 1.55em;
+      }
+
+      .hero__amp {
+        top: 41%;
+        left: 50%;
+        margin: 0;
+        font-size: 0.75em;
+      }
+
+      .hero__name--bride {
+        top: 57%;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        font-size: 1.3em;
+      }
     }
   }
 }
