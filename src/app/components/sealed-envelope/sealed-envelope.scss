@@ -7,7 +7,7 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  width: min(72vw, 400px);
+  width: min(58vw, 280px);
   gap: 0.25rem;
 
   &__hint {
@@ -42,7 +42,6 @@
   width: 100%;
   border-radius: var(--radius);
   transition: transform 0.35s ease, filter 0.35s ease;
-  animation: sealed-env-fade 0.85s ease 1.9s both;
 
   &__art {
     width: 100%;
@@ -105,16 +104,10 @@
     transition: none;
   }
 
-  .stage__hint,
-  .envelope {
+  .stage__hint {
     animation: none;
     opacity: 1;
   }
-}
-
-@keyframes sealed-env-fade {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
 @keyframes sealed-hint-fade {

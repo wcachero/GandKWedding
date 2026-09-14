@@ -27,17 +27,17 @@ import {
         <svg class="envelope__art" viewBox="70 50 380 372" role="img" aria-hidden="true">
           <defs>
             <linearGradient id="openBody" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#d4bc8a" />
-              <stop offset="100%" stop-color="#9a7d45" />
+              <stop offset="0%" stop-color="#f4e6cf" />
+              <stop offset="100%" stop-color="#c6a982" />
             </linearGradient>
             <linearGradient id="openFlap" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#c3a46b" />
-              <stop offset="100%" stop-color="#8a6e3a" />
+              <stop offset="0%" stop-color="#e7d8bc" />
+              <stop offset="100%" stop-color="#b9a27a" />
             </linearGradient>
             <linearGradient id="openPocket" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#e7d8bc" />
-              <stop offset="35%" stop-color="#d4bc8a" />
-              <stop offset="100%" stop-color="#c3a46b" />
+              <stop offset="0%" stop-color="#fff8ef" />
+              <stop offset="35%" stop-color="#e7d8bc" />
+              <stop offset="100%" stop-color="#d4c4a0" />
             </linearGradient>
           </defs>
 
@@ -57,7 +57,7 @@ import {
           <!-- Envelope body + front pocket (in front of the letter's lower half) -->
           <rect x="74" y="206" width="372" height="210" rx="14" fill="url(#openBody)" />
           <path d="M74 416 L260 214 L446 416 Z" fill="url(#openPocket)" />
-          <path d="M74 416 L260 214 L446 416" fill="none" stroke="#e7d8bc" stroke-width="1.5" opacity="0.5" />
+          <path d="M74 416 L260 214 L446 416" fill="none" stroke="#fff8ef" stroke-width="1.5" opacity="0.55" />
         </svg>
       </button>
     </section>
