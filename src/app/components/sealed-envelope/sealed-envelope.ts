@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, output } from '@angular/core';
 
 /**
  * Stage 1 — the sealed envelope.
- * A champagne envelope with a lighter seal and the GK monogram.
+ * A soft-blush envelope with a lighter seal and the GK monogram.
  * Emits `open` when the user taps / activates it.
  */
 @Component({
@@ -19,33 +19,33 @@ import { ChangeDetectionStrategy, Component, output } from '@angular/core';
         <svg class="envelope__art" viewBox="0 0 500 360" role="img" aria-hidden="true">
           <defs>
             <linearGradient id="sealedBody" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#f4e6cf" />
-              <stop offset="52%" stop-color="#e7d8bc" />
-              <stop offset="100%" stop-color="#c6a982" />
+              <stop offset="0%" stop-color="#f7e4dc" />
+              <stop offset="52%" stop-color="#efd0c6" />
+              <stop offset="100%" stop-color="#e3b8ac" />
             </linearGradient>
             <linearGradient id="sealedFlap" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#f7efe0" />
-              <stop offset="100%" stop-color="#d4c4a0" />
+              <stop offset="0%" stop-color="#fbeee8" />
+              <stop offset="100%" stop-color="#e8c4b8" />
             </linearGradient>
             <radialGradient id="sealFill" cx="38%" cy="30%" r="72%">
-              <stop offset="0%" stop-color="#fff8ef" />
-              <stop offset="55%" stop-color="#f4e6cf" />
-              <stop offset="100%" stop-color="#e7d8bc" />
+              <stop offset="0%" stop-color="#fff8f4" />
+              <stop offset="55%" stop-color="#f7e4dc" />
+              <stop offset="100%" stop-color="#efd0c6" />
             </radialGradient>
           </defs>
 
           <!-- Body -->
-          <rect x="14" y="46" width="472" height="286" rx="16" fill="url(#sealedBody)" />
+          <rect x="14" y="46" width="472" height="286" rx="16" fill="url(#sealedBody)" stroke="#e3a379" stroke-width="2" />
           <!-- Lower pocket fold lines -->
-          <path d="M14 332 L250 200 L486 332" fill="none" stroke="#a89068" stroke-width="2" opacity="0.45" />
+          <path d="M14 332 L250 200 L486 332" fill="none" stroke="#e3a379" stroke-width="2" opacity="0.85" />
           <!-- Closed flap -->
-          <path d="M14 52 Q14 46 26 46 L474 46 Q486 46 486 52 L250 214 Z" fill="url(#sealedFlap)" />
-          <path d="M14 52 L250 214 L486 52" fill="none" stroke="#fff8ef" stroke-width="1.5" opacity="0.55" />
+          <path d="M14 52 Q14 46 26 46 L474 46 Q486 46 486 52 L250 214 Z" fill="url(#sealedFlap)" stroke="#e3a379" stroke-width="1.5" />
+          <path d="M14 52 L250 214 L486 52" fill="none" stroke="#e3a379" stroke-width="1.5" opacity="0.8" />
 
           <!-- Champagne seal with GK monogram -->
           <g transform="translate(250 208)">
-            <circle r="58" fill="url(#sealFill)" stroke="#c6a982" stroke-width="2.2" />
-            <circle r="51" fill="none" stroke="#c6a982" stroke-width="1.4" opacity="0.85" />
+            <circle r="58" fill="url(#sealFill)" stroke="#e3b8ac" stroke-width="2.2" />
+            <circle r="51" fill="none" stroke="#efd0c6" stroke-width="1.4" opacity="0.9" />
             <image
               href="images/gk-monogram.png"
               x="-46"
