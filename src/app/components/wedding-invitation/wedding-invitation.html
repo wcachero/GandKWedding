@@ -297,8 +297,8 @@
       <button type="button" class="btn cal-modal__opt" (click)="copyShareLink()">
         {{ copied() ? 'Link Copied!' : 'Copy Link' }}
       </button>
-      <a class="btn cal-modal__opt cal-modal__opt--ghost" [href]="fbShareUrl()" target="_blank" rel="noopener" (click)="pickShare()">
-        Share on Facebook
+      <a class="btn cal-modal__opt cal-modal__opt--ghost" [href]="messengerShareUrl()" rel="noopener" (click)="pickShare()">
+        Share on Messenger
       </a>
       <a class="btn cal-modal__opt cal-modal__opt--ghost" [href]="waShareUrl()" target="_blank" rel="noopener" (click)="pickShare()">
         Share on WhatsApp

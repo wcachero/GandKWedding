@@ -256,9 +256,10 @@ export class WeddingInvitation {
   protected readonly canNativeShare = signal(false);
 
   /** Social share links, built from the resolved page URL. */
-  protected readonly fbShareUrl = computed(
-    () => `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(this.shareUrl())}`,
-  );
+  protected readonly messengerShareUrl = computed(() => {
+    const link = encodeURIComponent(this.shareUrl());
+    return `fb-messenger://share/?link=${link}`;
+  });
   protected readonly waShareUrl = computed(
     () => `https://wa.me/?text=${encodeURIComponent("You're invited! " + this.shareUrl())}`,
   );
@@ -411,23 +412,28 @@ export class WeddingInvitation {
           }
           ctx.drawImage(qr, 0, 0);
 
-          const maxLogoW = size * 0.36;
-          const maxLogoH = size * 0.13;
-          const scale = Math.min(maxLogoW / logo.width, maxLogoH / logo.height);
-          const logoW = logo.width * scale;
-          const logoH = logo.height * scale;
-          const pad = size * 0.028;
-          const boxW = logoW + pad * 2;
-          const boxH = logoH + pad * 2;
-          const boxX = (size - boxW) / 2;
-          const boxY = (size - boxH) / 2;
-          const radius = size * 0.022;
+          const cx = size / 2;
+          const cy = size / 2;
+          const outerR = size * 0.12;
+          const innerR = size * 0.102;
+          const ring = outerR - innerR;
 
           ctx.fillStyle = '#ffffff';
           ctx.beginPath();
-          ctx.roundRect(boxX, boxY, boxW, boxH, radius);
+          ctx.arc(cx, cy, outerR + ring * 0.35, 0, Math.PI * 2);
           ctx.fill();
-          ctx.drawImage(logo, (size - logoW) / 2, (size - logoH) / 2, logoW, logoH);
+
+          const fit = innerR * 1.65;
+          const scale = Math.min(fit / logo.width, fit / logo.height);
+          const logoW = logo.width * scale;
+          const logoH = logo.height * scale;
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(cx, cy, innerR, 0, Math.PI * 2);
+          ctx.clip();
+          ctx.drawImage(logo, cx - logoW / 2, cy - logoH / 2, logoW, logoH);
+          ctx.restore();
 
           resolve(canvas.toDataURL('image/png'));
         };
