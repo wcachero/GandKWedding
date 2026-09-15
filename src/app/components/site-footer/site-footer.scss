@@ -14,7 +14,7 @@
   align-items: center;
   text-align: center;
   padding: clamp(3.5rem, 8vw, 6rem) var(--space-6) clamp(2.5rem, 5vw, 3.5rem);
-  border-top: 2px solid #e3a379;
+  border-top: 1px solid #e3a379;
   background:
     linear-gradient(
       180deg,
@@ -113,7 +113,7 @@
     border-radius: 50%;
     color: #6e5224;
     background: rgba(255, 248, 239, 0.72);
-    border: 1px solid rgba(195, 164, 107, 0.55);
+    border: 1px solid #e3a379;
     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
     transition: transform 0.22s ease, background 0.22s ease, color 0.22s ease;
 

@@ -85,7 +85,7 @@
   );
   backdrop-filter: blur(28px) saturate(1.85);
   -webkit-backdrop-filter: blur(28px) saturate(1.85);
-  border-bottom: 1px solid rgba(255, 248, 230, 0.45);
+  border-bottom: 1px solid #e3a379;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.5),
     0 8px 24px rgba(18, 14, 8, 0.14);
@@ -1324,7 +1324,7 @@
   justify-content: center;
   gap: var(--space-2);
   padding: 0.9rem 1.9rem;
-  border: 1px solid rgba(195, 164, 107, 0.78);
+  border: 1px solid #e3a379;
   border-radius: 2px;
   background:
     linear-gradient(
@@ -1353,7 +1353,7 @@
 
   &:hover {
     transform: translateY(-2px);
-    border-color: #c3a46b;
+    border-color: #d4895e;
     color: #3f2d1c;
     background:
       linear-gradient(
@@ -1403,7 +1403,7 @@
       rgba(241, 226, 200, 0.94) 100%
     );
   color: #5e4635;
-  border-color: rgba(255, 248, 239, 0.55);
+  border-color: #e3a379;
 }
 
 /* ----- Share (QR + link) -------------------------------------------------- */
