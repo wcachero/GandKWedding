@@ -392,7 +392,27 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.5),
     0 -16px 36px rgba(18, 14, 8, 0.18);
 
+  /* Warm peach fade rising above the footer nav */
   &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    height: clamp(2.75rem, 8vw, 4.25rem);
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(227, 163, 121, 0.12) 35%,
+      rgba(227, 163, 121, 0.32) 70%,
+      rgba(227, 163, 121, 0.5) 100%
+    );
+  }
+
+  /* Inner liquid sheen (kept above the peach edge fade) */
+  &::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -412,26 +432,17 @@
         rgba(255, 255, 255, 0.28) 42%,
         rgba(255, 248, 230, 0.1) 50%,
         transparent 58%
+      ),
+      linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.72),
+        transparent
       );
-    background-size: 100% 100%, 220% 100%;
+    background-size: 100% 100%, 220% 100%, 76% 1px;
+    background-repeat: no-repeat;
+    background-position: 0 0, 0 0, center 0;
     animation: tabbar-liquid 8s ease-in-out infinite;
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    left: 12%;
-    right: 12%;
-    top: 0;
-    height: 1px;
-    z-index: 1;
-    pointer-events: none;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.72),
-      transparent
-    );
   }
 
   &__item {
@@ -512,7 +523,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .tabbar__item { transition: none; }
-  .tabbar::before { animation: none; }
+  .tabbar::after { animation: none; }
 }
 
 @keyframes tabbar-liquid {

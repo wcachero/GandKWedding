@@ -21,6 +21,11 @@
   </ul>
 </nav>
 
+<!-- Soft peach wash that appears at the top while the sticky nav is collapsed -->
+<div class="scroll-top-fade"
+     [class.scroll-top-fade--on]="navHidden()"
+     aria-hidden="true"></div>
+
 <article class="invite" id="top">
   <!-- Parallax hero -->
   <header class="hero">
@@ -240,7 +245,11 @@
       <p class="rsvp__lead" [appReveal]="80">{{ wedding.rsvp.note }}</p>
 
       <div class="rsvp__form" appReveal>
-        <iframe [src]="rsvpEmbed" title="RSVP form" loading="lazy"></iframe>
+        <iframe
+          [src]="rsvpEmbed"
+          title="RSVP form"
+          loading="lazy"
+        ></iframe>
       </div>
       <p class="rsvp__fallback" appReveal>
         Form not loading?
