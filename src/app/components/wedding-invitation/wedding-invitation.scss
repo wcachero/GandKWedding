@@ -638,10 +638,11 @@
 }
 
 .datebar {
-  display: inline-flex;
+  display: flex;
   align-items: stretch;
   justify-content: center;
   flex-wrap: wrap;
+  width: 100%;
   max-width: 100%;
   gap: clamp(1rem, 3.5vw, 2rem);
   padding: var(--space-6) clamp(1rem, 4vw, 2.25rem);
@@ -680,17 +681,30 @@
   margin: var(--space-8) auto 0;
 }
 
-/* Keep the date on a single line on phones (abbreviate the month to fit). */
-@media (max-width: 480px) {
+/* Mobile: larger type, full-width date strip */
+@media (max-width: 680px) {
   .datebar {
+    display: flex;
+    width: 100vw;
+    max-width: 100vw;
+    margin-inline: calc(50% - 50vw);
     flex-wrap: nowrap;
-    gap: 0.5rem;
-    padding-inline: 0.5rem;
+    justify-content: space-between;
+    gap: 0.35rem;
+    padding: var(--space-6) clamp(0.85rem, 3.5vw, 1.35rem);
+    box-sizing: border-box;
 
-    &__big { font-size: 1.05rem; }
-    &__day { font-size: 2.1rem; }
-    &__small { font-size: 0.5rem; letter-spacing: 0.1em; }
-    &__cell--day { padding-inline: var(--space-3); }
+    &__cell {
+      flex: 1 1 0;
+      align-items: center;
+      text-align: center;
+      min-width: 0;
+    }
+
+    &__big { font-size: clamp(1.2rem, 4.6vw, 1.55rem); }
+    &__day { font-size: clamp(2.85rem, 11vw, 3.6rem); }
+    &__small { font-size: clamp(0.62rem, 2.4vw, 0.78rem); letter-spacing: 0.14em; }
+    &__cell--day { padding-inline: clamp(0.5rem, 2vw, 1rem); }
     &__month-full { display: none; }
     &__month-abbr { display: inline; }
   }
@@ -827,63 +841,27 @@
       );
   }
 
-  /* Champagne liquid glass — high transparency */
+  /*
+   * Warm peach plate at 45%.
+   * Cream type + dark soft shadow reads more clearly over busy venue photos
+   * than thin dark caps. Heading serif used for all detail lines.
+   */
   &__content {
     position: relative;
     z-index: 2;
-    isolation: isolate;
-    overflow: hidden;
-    width: min(92vw, 38rem);
+    width: min(92vw, 40rem);
     margin-bottom: clamp(6.5rem, 18vh, 10rem);
-    padding: clamp(1.5rem, 4.5vw, 2.35rem) clamp(1.25rem, 4vw, 2.25rem) clamp(2.5rem, 6vw, 3.25rem);
-    color: #2f1a12;
+    padding: clamp(1.75rem, 4.5vw, 2.65rem) clamp(1.4rem, 4vw, 2.5rem) clamp(2.5rem, 6vw, 3.25rem);
+    color: #fff8ef;
     border-radius: 16px;
-    border: 1px solid rgba(195, 164, 107, 0.16);
-    background: linear-gradient(
-      165deg,
-      rgba(255, 248, 239, 0.05) 0%,
-      rgba(231, 216, 188, 0.03) 42%,
-      rgba(195, 164, 107, 0.03) 100%
-    );
-    box-shadow:
-      inset 0 1px 0 rgba(255, 248, 239, 0.18),
-      inset 0 -1px 0 rgba(195, 164, 107, 0.04),
-      0 6px 18px rgba(62, 36, 22, 0.06);
-    backdrop-filter: blur(8px) saturate(1.1);
-    -webkit-backdrop-filter: blur(8px) saturate(1.1);
-
-    &::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      background:
-        linear-gradient(
-          115deg,
-          rgba(255, 248, 239, 0.06) 0%,
-          rgba(231, 216, 188, 0.02) 30%,
-          transparent 55%,
-          rgba(195, 164, 107, 0.03) 100%
-        ),
-        linear-gradient(
-          90deg,
-          transparent 0%,
-          rgba(255, 248, 239, 0.04) 42%,
-          rgba(195, 164, 107, 0.03) 50%,
-          transparent 58%
-        );
-      background-size: 100% 100%, 220% 100%;
-      animation: nav-menu-liquid 8s ease-in-out infinite;
-    }
-
-    > * {
-      position: relative;
-      z-index: 1;
-    }
+    border: 1px solid rgba(255, 248, 239, 0.35);
+    background:
+      linear-gradient(rgba(62, 36, 22, 0.22), rgba(62, 36, 22, 0.22)),
+      rgba(227, 163, 121, 0.45);
+    box-shadow: 0 14px 36px rgba(20, 12, 8, 0.28);
   }
 
-  /* Ceremony + reception: liquid glass vertically centered on the photo */
+  /* Ceremony + reception: detail plate vertically centered on the photo */
   &--ceremony,
   &--reception {
     place-items: center;
@@ -896,56 +874,51 @@
   }
 
   &__name {
-    font-family: var(--font-ui);
-    font-weight: 600;
+    font-family: var(--font-heading);
+    font-weight: 700;
     font-style: normal;
-    text-transform: uppercase;
-    letter-spacing: 0.28em;
-    font-size: clamp(0.95rem, 0.85rem + 0.45vw, 1.1rem);
-    line-height: 1.55;
-    margin: var(--space-5) 0 var(--space-5);
-    color: #2f1a12;
+    text-transform: none;
+    letter-spacing: 0.01em;
+    font-size: clamp(1.65rem, 1.25rem + 1.6vw, 2.35rem);
+    line-height: 1.25;
+    margin: var(--space-3) 0 var(--space-4);
+    color: #fff8ef;
     text-shadow:
-      0 0 10px rgba(227, 163, 121, 0.75),
-      0 0 22px rgba(227, 163, 121, 0.55),
-      0 0 36px rgba(227, 163, 121, 0.35),
-      0 1px 2px rgba(255, 248, 239, 0.4);
+      0 1px 2px rgba(20, 12, 8, 0.75),
+      0 4px 18px rgba(20, 12, 8, 0.55);
   }
 
   &__meta {
-    font-family: var(--font-ui);
-    font-style: normal;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.22em;
-    color: #2f1a12;
-    font-size: clamp(0.78rem, 0.72rem + 0.3vw, 0.9rem);
-    line-height: 1.75;
-    margin-bottom: var(--space-5);
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    color: #fff8ef;
+    font-size: clamp(1.15rem, 1rem + 0.55vw, 1.4rem);
+    line-height: 1.5;
+    margin-bottom: var(--space-3);
     text-shadow:
-      0 0 10px rgba(227, 163, 121, 0.7),
-      0 0 20px rgba(227, 163, 121, 0.5),
-      0 0 32px rgba(227, 163, 121, 0.3),
-      0 1px 2px rgba(255, 248, 239, 0.35);
+      0 1px 2px rgba(20, 12, 8, 0.7),
+      0 3px 14px rgba(20, 12, 8, 0.45);
     opacity: 1;
 
     & + .btn { margin-top: var(--space-5, 1.25rem); }
   }
 
   .venue__kicker--light {
-    font-family: var(--font-ui);
-    font-size: 0.9rem;
-    letter-spacing: 0.34em;
-    font-weight: 600;
+    font-family: var(--font-heading);
+    font-size: clamp(0.95rem, 0.85rem + 0.4vw, 1.1rem);
+    letter-spacing: 0.2em;
+    font-weight: 700;
+    font-style: normal;
     text-transform: uppercase;
-    color: #2f1a12;
-    opacity: 1;
-    margin-bottom: var(--space-4);
+    color: #fff8ef;
+    opacity: 0.95;
+    margin-bottom: var(--space-3);
     text-shadow:
-      0 0 10px rgba(227, 163, 121, 0.7),
-      0 0 20px rgba(227, 163, 121, 0.5),
-      0 0 32px rgba(227, 163, 121, 0.3),
-      0 1px 2px rgba(255, 248, 239, 0.35);
+      0 1px 2px rgba(20, 12, 8, 0.7),
+      0 3px 12px rgba(20, 12, 8, 0.4);
   }
 
   .btn {

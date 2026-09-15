@@ -65,7 +65,7 @@ export const WEDDING: Wedding = {
   ceremony: {
     title: 'Santa Rosa de Lima Parish Church',
     kicker: 'The Ceremony',
-    time: '8:30 in the morning',
+    time: '8:30am',
     venue: 'Santa Rosa de Lima Parish Church',
     address: 'F. Gomez Street, Brgy. Kanluran, City of Santa Rosa, Laguna',
     mapQuery: 'Santa Rosa de Lima Parish Church, F. Gomez Street, Brgy. Kanluran, Santa Rosa, Laguna',
