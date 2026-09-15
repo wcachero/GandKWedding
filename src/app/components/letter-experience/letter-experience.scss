@@ -326,8 +326,22 @@
     overflow: visible;
     background: #f6efe6;
 
-    .scene__content { display: block; }
-    .scene__footer { margin-top: 0; }
+    /* Keep invitation above the footer so parallax/footer layers never cover content. */
+    .scene__content {
+      display: block;
+      position: relative;
+      z-index: 2;
+      isolation: isolate;
+      background: #f6efe6;
+    }
+
+    .scene__footer {
+      position: relative;
+      z-index: 1;
+      margin-top: 0;
+      display: block;
+      width: 100%;
+    }
   }
 }
 

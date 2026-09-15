@@ -1,6 +1,9 @@
 :host {
   display: block;
   width: 100%;
+  position: relative;
+  z-index: 2;
+  isolation: isolate;
   overflow-x: clip;
   --color-bg: #f6efe6;
   --color-bg-deep: #eadcc8;
@@ -879,7 +882,7 @@
     font-style: normal;
     text-transform: none;
     letter-spacing: 0.01em;
-    font-size: clamp(1.65rem, 1.25rem + 1.6vw, 2.35rem);
+    font-size: clamp(1.95rem, 1.45rem + 2vw, 2.75rem);
     line-height: 1.25;
     margin: var(--space-3) 0 var(--space-4);
     color: #fff8ef;
@@ -895,7 +898,7 @@
     text-transform: none;
     letter-spacing: 0.02em;
     color: #fff8ef;
-    font-size: clamp(1.15rem, 1rem + 0.55vw, 1.4rem);
+    font-size: clamp(1.35rem, 1.15rem + 0.8vw, 1.7rem);
     line-height: 1.5;
     margin-bottom: var(--space-3);
     text-shadow:
@@ -908,7 +911,7 @@
 
   .venue__kicker--light {
     font-family: var(--font-heading);
-    font-size: clamp(0.95rem, 0.85rem + 0.4vw, 1.1rem);
+    font-size: clamp(1.1rem, 0.95rem + 0.55vw, 1.35rem);
     letter-spacing: 0.2em;
     font-weight: 700;
     font-style: normal;
@@ -1146,21 +1149,6 @@
     height: auto;
     margin-inline: auto;
     opacity: 0.9;
-  }
-}
-
-.floral-sep {
-  padding: var(--space-12) var(--space-6) var(--space-2);
-  text-align: center;
-  background: #f6efe6;
-
-  img {
-    display: block;
-    width: min(70%, 340px);
-    height: auto;
-    margin-inline: auto;
-    opacity: 0.85;
-    filter: sepia(0.2);
   }
 }
 
@@ -1420,12 +1408,19 @@
 
 /* ----- Share (QR + link) -------------------------------------------------- */
 .share {
+  padding-top: clamp(1.25rem, 3vw, 2.25rem);
+
+  .section__title {
+    margin-bottom: var(--space-6);
+  }
+
   &__grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: clamp(1rem, 3vw, 1.75rem);
     max-width: 620px;
     margin-inline: auto;
+    margin-top: 0;
   }
 
   &__card {
