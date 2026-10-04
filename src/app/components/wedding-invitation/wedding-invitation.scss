@@ -785,17 +785,17 @@
 
 /* ----- Venues ------------------------------------------------------------- */
 .venue {
+  position: relative;
+  overflow: hidden;
   background: var(--color-bg);
   padding-top: 0;
   padding-bottom: 0;
 
   &__heading {
     position: relative;
-    overflow: hidden;
-    padding: clamp(2.75rem, 7vw, 4.25rem) 0 clamp(2.25rem, 5.5vw, 3.25rem);
-    background:
-      radial-gradient(ellipse 80% 55% at 50% 0%, rgba(255, 248, 239, 0.92), transparent 68%),
-      linear-gradient(180deg, #f7ebe3 0%, #f3e0d4 100%);
+    z-index: 3;
+    padding: clamp(2.75rem, 7vw, 4.25rem) 0 clamp(1.25rem, 3vw, 2rem);
+    background: transparent;
 
     .container,
     .section__title {
@@ -808,15 +808,15 @@
 
   &__bloom {
     position: absolute;
-    z-index: 0;
+    z-index: 2;
     pointer-events: none;
     overflow: hidden;
-    opacity: 0.78;
+    opacity: 0.9;
 
     &--tr {
       top: -0.35rem;
       right: -1rem;
-      width: clamp(8.5rem, 30vw, 16rem);
+      width: clamp(10rem, 32vw, 18rem);
       aspect-ratio: 613 / 689;
 
       .venue__bloom-layer {
@@ -827,11 +827,25 @@
     &--bl {
       bottom: -0.85rem;
       left: -0.75rem;
-      width: clamp(8rem, 28vw, 15rem);
+      width: clamp(9.5rem, 30vw, 17rem);
       aspect-ratio: 586 / 680;
 
       .venue__bloom-layer {
         background-image: url("/images/entourage-floral-bl.png");
+      }
+    }
+
+    @media (max-width: 680px) {
+      &--tr {
+        top: -0.25rem;
+        right: -1.6rem;
+        width: 8.75rem;
+      }
+
+      &--bl {
+        bottom: -1.5rem;
+        left: -2.15rem;
+        width: 8.5rem;
       }
     }
   }
@@ -905,7 +919,6 @@
 .venue-parallax {
   position: relative;
   overflow: hidden;
-  isolation: isolate;
   min-height: clamp(70vh, 74vh, 860px);
   min-height: clamp(70dvh, 74dvh, 860px);
   max-width: 100%;
@@ -937,7 +950,7 @@
 
   &__content {
     position: relative;
-    z-index: 2;
+    z-index: 3;
     width: min(92%, 40rem);
     margin-bottom: clamp(6.5rem, 18vh, 10rem);
     padding: clamp(1.75rem, 4.5vw, 2.65rem) clamp(1.4rem, 4vw, 2.5rem) clamp(2.5rem, 6vw, 3.25rem);

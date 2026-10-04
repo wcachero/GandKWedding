@@ -53,7 +53,7 @@
     </div>
     <div class="hero__when">
       <p class="hero__date">{{ wedding.dateShort }}</p>
-      <p class="hero__place">Santa Rosa, Laguna</p>
+      <p class="hero__place">Wedding</p>
     </div>
     <a class="hero__scroll" href="#details" aria-label="Scroll to details">
       <span></span>
@@ -123,13 +123,13 @@
 
   <!-- Venues -->
   <section class="venue section" id="venue">
+    <div class="venue__bloom venue__bloom--tr" aria-hidden="true">
+      <span class="venue__bloom-layer" [appParallax]="0.35"></span>
+    </div>
+    <div class="venue__bloom venue__bloom--bl" aria-hidden="true">
+      <span class="venue__bloom-layer" [appParallax]="0.35"></span>
+    </div>
     <div class="venue__heading">
-      <div class="venue__bloom venue__bloom--tr" aria-hidden="true">
-        <span class="venue__bloom-layer" [appParallax]="0.35"></span>
-      </div>
-      <div class="venue__bloom venue__bloom--bl" aria-hidden="true">
-        <span class="venue__bloom-layer" [appParallax]="0.35"></span>
-      </div>
       <div class="container">
         <h2 class="section__title" appReveal>The Celebration</h2>
       </div>
