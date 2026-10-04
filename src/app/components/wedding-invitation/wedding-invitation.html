@@ -16,6 +16,7 @@
     <li><a href="#details" (click)="closeMenu()">Details</a></li>
     <li><a href="#venue" (click)="closeMenu()">Venue</a></li>
     <li><a href="#attire" (click)="closeMenu()">Attire</a></li>
+    <li><a href="#entourage" (click)="closeMenu()">Entourage</a></li>
     <li><a href="#gallery" (click)="closeMenu()">Gallery</a></li>
     <li><a href="#rsvp" (click)="closeMenu()">RSVP</a></li>
   </ul>
@@ -238,11 +239,107 @@
 
   <div class="divider" aria-hidden="true"><img src="images/flourish.svg" alt="" appReveal /></div>
 
+  <!-- Entourage -->
+  <section class="section entourage" id="entourage">
+    <div class="container">
+      <p class="section__label" appReveal>With grateful hearts</p>
+      <h2 class="section__title" [appReveal]="60">The Entourage</h2>
+
+      <div class="entourage__card" appReveal>
+        <img class="entourage__floral entourage__floral--tr" src="images/entourage-floral-tr.png" alt="" aria-hidden="true" />
+        <img class="entourage__floral entourage__floral--bl" src="images/entourage-floral-bl.png" alt="" aria-hidden="true" />
+
+        <div class="entourage__frame">
+          <div class="entourage__cols">
+            <div class="entourage__block">
+              <p class="entourage__role">Parents of the Groom</p>
+              <img class="entourage__flourish" src="images/flourish.svg" alt="" aria-hidden="true" />
+              @for (name of wedding.entourage.parentsOfGroom; track name) {
+                <p class="entourage__name">{{ name }}</p>
+              }
+            </div>
+            <div class="entourage__block">
+              <p class="entourage__role">Parents of the Bride</p>
+              <img class="entourage__flourish" src="images/flourish.svg" alt="" aria-hidden="true" />
+              @for (name of wedding.entourage.parentsOfBride; track name) {
+                <p class="entourage__name">{{ name }}</p>
+              }
+            </div>
+          </div>
+
+          <div class="entourage__block entourage__block--full">
+            <p class="entourage__role">Principal Sponsors</p>
+            <img class="entourage__flourish" src="images/flourish.svg" alt="" aria-hidden="true" />
+            <div class="entourage__sponsors">
+              @for (pair of wedding.entourage.principalSponsors; track pair.gentlemen) {
+                <p class="entourage__name">{{ pair.gentlemen }}</p>
+                <p class="entourage__name">{{ pair.ladies }}</p>
+              }
+            </div>
+          </div>
+
+          <div class="entourage__cols">
+            <div class="entourage__block">
+              <p class="entourage__role">Best Man</p>
+              <img class="entourage__flourish" src="images/flourish.svg" alt="" aria-hidden="true" />
+              <p class="entourage__name">{{ wedding.entourage.bestMan }}</p>
+            </div>
+            <div class="entourage__block">
+              <p class="entourage__role">Maid of Honor</p>
+              <img class="entourage__flourish" src="images/flourish.svg" alt="" aria-hidden="true" />
+              <p class="entourage__name">{{ wedding.entourage.maidOfHonor }}</p>
+            </div>
+          </div>
+
+          <div class="entourage__cols entourage__cols--secondary">
+            @for (s of wedding.entourage.secondarySponsors; track s.role) {
+              <div class="entourage__block">
+                <p class="entourage__role">{{ s.role }}</p>
+                <img class="entourage__flourish" src="images/flourish.svg" alt="" aria-hidden="true" />
+                @for (name of s.pair.split(' & '); track name) {
+                  <p class="entourage__name">{{ name }}</p>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="entourage__cols entourage__cols--bearers">
+            @for (b of wedding.entourage.bearers; track b.role) {
+              <div class="entourage__block">
+                <p class="entourage__role">{{ b.role }}</p>
+                <img class="entourage__flourish" src="images/flourish.svg" alt="" aria-hidden="true" />
+                <p class="entourage__name">{{ b.name }}</p>
+              </div>
+            }
+          </div>
+
+          @if (wedding.entourage.flowerGirls.length) {
+            <div class="entourage__block entourage__block--full">
+              <p class="entourage__role">Flower Girl</p>
+              <img class="entourage__flourish" src="images/flourish.svg" alt="" aria-hidden="true" />
+              <div class="entourage__sponsors">
+                @for (name of wedding.entourage.flowerGirls; track name) {
+                  <p class="entourage__name">{{ name }}</p>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider" aria-hidden="true"><img src="images/flourish.svg" alt="" appReveal /></div>
+
   <!-- RSVP -->
   <section class="section rsvp" id="rsvp">
     <div class="container">
       <p class="script-accent" appReveal>R S V P</p>
       <p class="rsvp__lead" [appReveal]="80">{{ wedding.rsvp.note }}</p>
+      <p class="rsvp__deadline" [appReveal]="100">
+        <span class="rsvp__deadline-label">Kindly reply on or before</span>
+        <span class="rsvp__deadline-date">{{ wedding.rsvp.deadline }}</span>
+      </p>
 
       <div class="rsvp__form" appReveal>
         <iframe
@@ -385,6 +482,13 @@
       </div>
       <p class="qr-modal__hint">Scan to open this invitation</p>
       <p class="qr-modal__url">{{ shareUrl() }}</p>
+      <button
+        type="button"
+        class="btn qr-modal__download"
+        (click)="downloadQr()"
+        [disabled]="!qrDataUrl() || qrDownloading()">
+        {{ qrDownloading() ? 'Preparing…' : 'Download QR' }}
+      </button>
     </div>
   </div>
 }

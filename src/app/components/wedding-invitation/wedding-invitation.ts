@@ -520,6 +520,197 @@ export class WeddingInvitation {
     this.qrOpen.set(false);
   }
 
+  /** True while the themed QR card PNG is being composed for download. */
+  protected readonly qrDownloading = signal(false);
+
+  /** Build a themed invitation card (header + QR) and download it as PNG. */
+  protected async downloadQr(): Promise<void> {
+    const qr = this.qrDataUrl();
+    if (!qr || this.qrDownloading()) {
+      return;
+    }
+
+    this.qrDownloading.set(true);
+    try {
+      const dataUrl = await this.buildDownloadableQrCard(qr);
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = `${this.wedding.groom.toLowerCase()}-${this.wedding.bride.toLowerCase()}-wedding-invitation-qr.png`;
+      link.rel = 'noopener';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch {
+      /* keep modal usable if canvas/fonts fail */
+    } finally {
+      this.qrDownloading.set(false);
+    }
+  }
+
+  /** Cream card with gold frame, names header, and branded QR — wedding palette. */
+  private async buildDownloadableQrCard(qrDataUrl: string): Promise<string> {
+    if (document.fonts?.ready) {
+      await document.fonts.ready;
+    }
+
+    const qrImg = await this.loadImage(qrDataUrl);
+    const width = 1080;
+    const height = 1480;
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      throw new Error('Canvas unavailable');
+    }
+
+    // Blush → cream wash
+    const bg = ctx.createLinearGradient(0, 0, 0, height);
+    bg.addColorStop(0, '#f7ebe3');
+    bg.addColorStop(0.45, '#fbf6f1');
+    bg.addColorStop(1, '#ecd4c4');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, width, height);
+
+    // Soft peach glow behind the card
+    const glow = ctx.createRadialGradient(width / 2, height * 0.28, 40, width / 2, height * 0.35, width * 0.55);
+    glow.addColorStop(0, 'rgba(227, 163, 121, 0.28)');
+    glow.addColorStop(1, 'rgba(227, 163, 121, 0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, width, height);
+
+    // Outer gold frame
+    const inset = 48;
+    ctx.strokeStyle = 'rgba(195, 164, 107, 0.95)';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(inset, inset, width - inset * 2, height - inset * 2);
+    ctx.strokeStyle = 'rgba(195, 164, 107, 0.55)';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(inset + 14, inset + 14, width - (inset + 14) * 2, height - (inset + 14) * 2);
+
+    // Header
+    const names = `${this.wedding.groom} & ${this.wedding.bride}`;
+    ctx.fillStyle = '#6e5224';
+    ctx.textAlign = 'center';
+    ctx.font = '400 92px "Great Vibes", cursive';
+    ctx.fillText(names, width / 2, 220);
+
+    // Gold rule under names
+    this.drawGoldRule(ctx, width / 2, 268, 280);
+
+    ctx.fillStyle = '#a67c52';
+    ctx.font = '600 28px Cinzel, serif';
+    this.fillSpacedText(ctx, 'WEDDING INVITATION', width / 2, 330, 8);
+
+    ctx.fillStyle = '#6e5c4e';
+    ctx.font = '500 26px "Cormorant Garamond", serif';
+    const { month, day, year } = this.wedding.dateLong;
+    ctx.fillText(`${month} ${day}, ${year}`, width / 2, 380);
+
+    // QR panel
+    const qrSize = 640;
+    const qrX = (width - qrSize) / 2;
+    const qrY = 460;
+    const panelX = qrX - 28;
+    const panelY = qrY - 28;
+    const panelSize = qrSize + 56;
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowColor = 'rgba(94, 70, 53, 0.12)';
+    ctx.shadowBlur = 28;
+    ctx.shadowOffsetY = 10;
+    this.roundRectPath(ctx, panelX, panelY, panelSize, panelSize, 18);
+    ctx.fill();
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+
+    ctx.strokeStyle = 'rgba(195, 164, 107, 0.65)';
+    ctx.lineWidth = 2;
+    this.roundRectPath(ctx, panelX, panelY, panelSize, panelSize, 18);
+    ctx.stroke();
+
+    ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+
+    // Footer
+    this.drawGoldRule(ctx, width / 2, 1200, 200);
+    ctx.fillStyle = '#6e5c4e';
+    ctx.font = '500 30px "Cormorant Garamond", serif';
+    ctx.fillText('Scan to open our invitation', width / 2, 1260);
+
+    ctx.fillStyle = '#a67c52';
+    ctx.font = '600 20px Cinzel, serif';
+    ctx.fillText(this.wedding.monogram, width / 2, 1320);
+
+    return canvas.toDataURL('image/png');
+  }
+
+  private drawGoldRule(ctx: CanvasRenderingContext2D, cx: number, y: number, halfWidth: number): void {
+    const grad = ctx.createLinearGradient(cx - halfWidth, y, cx + halfWidth, y);
+    grad.addColorStop(0, 'rgba(195, 164, 107, 0)');
+    grad.addColorStop(0.5, 'rgba(195, 164, 107, 0.9)');
+    grad.addColorStop(1, 'rgba(195, 164, 107, 0)');
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(cx - halfWidth, y);
+    ctx.lineTo(cx + halfWidth, y);
+    ctx.stroke();
+
+    ctx.fillStyle = '#cf8f6b';
+    ctx.beginPath();
+    ctx.moveTo(cx, y - 5);
+    ctx.lineTo(cx + 5, y);
+    ctx.lineTo(cx, y + 5);
+    ctx.lineTo(cx - 5, y);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  private loadImage(src: string): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error('Image load failed'));
+      img.src = src;
+    });
+  }
+
+  private roundRectPath(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    r: number,
+  ): void {
+    const radius = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.arcTo(x + w, y, x + w, y + h, radius);
+    ctx.arcTo(x + w, y + h, x, y + h, radius);
+    ctx.arcTo(x, y + h, x, y, radius);
+    ctx.arcTo(x, y, x + w, y, radius);
+    ctx.closePath();
+  }
+
+  private fillSpacedText(
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    x: number,
+    y: number,
+    letterGap: number,
+  ): void {
+    const chars = [...text];
+    const widths = chars.map((ch) => ctx.measureText(ch).width);
+    const total =
+      widths.reduce((sum, w) => sum + w, 0) + letterGap * Math.max(0, chars.length - 1);
+    let cursor = x - total / 2;
+    for (let i = 0; i < chars.length; i++) {
+      ctx.fillText(chars[i], cursor + widths[i] / 2, y);
+      cursor += widths[i] + letterGap;
+    }
+  }
+
   protected openShare(): void {
     this.copied.set(false);
     this.shareOpen.set(true);

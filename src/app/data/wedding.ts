@@ -42,8 +42,20 @@ export interface Wedding {
   readonly rsvp: {
     readonly url: string;
     readonly note: string;
+    /** Soft deadline shown on the invitation (e.g. November 8, 2026). */
+    readonly deadline: string;
     readonly contacts: readonly { readonly name: string; readonly phone: string }[];
     readonly reservedNote: string;
+  };
+  readonly entourage: {
+    readonly parentsOfGroom: readonly string[];
+    readonly parentsOfBride: readonly string[];
+    readonly principalSponsors: readonly { readonly gentlemen: string; readonly ladies: string }[];
+    readonly bestMan: string;
+    readonly maidOfHonor: string;
+    readonly secondarySponsors: readonly { readonly role: string; readonly pair: string }[];
+    readonly bearers: readonly { readonly role: string; readonly name: string }[];
+    readonly flowerGirls: readonly string[];
   };
   readonly socials: readonly { readonly label: string; readonly url: string; readonly icon: 'facebook' | 'instagram' | 'tiktok' | 'email' }[];
 }
@@ -95,12 +107,48 @@ export const WEDDING: Wedding = {
   rsvp: {
     url: 'https://script.google.com/macros/s/AKfycbzJQmmnqci0N9stgHUoOX-v8p6mzRAyy82rrWXM1H-_45GBf2OdveebLXvxQTR9WKeJ/exec',
     note: 'Every seat is reserved with love and intention. Kindly confirm your attendance below.',
+    deadline: 'November 8, 2026',
     contacts: [
       { name: 'Karyle', phone: '0926 851 9693' },
       { name: 'Gilfred', phone: '0995 927 9620' },
     ],
     reservedNote:
       'Only guests with confirmed RSVPs will be accommodated at the celebration. We respectfully ask that you refer to the number of reserved seats indicated in your invitation.',
+  },
+  entourage: {
+    parentsOfGroom: [
+      'Mr. Virgilio Donal Dueñas',
+      'Mrs. Wenifreda Encina Dueñas',
+    ],
+    parentsOfBride: [
+      'Mr. Lorenzo Getape Lechuga',
+      'Mrs. Inday Cardama Lechuga',
+    ],
+    principalSponsors: [
+      { gentlemen: 'Mr. Alberto Manansala', ladies: 'Mrs. Annie Lera' },
+      { gentlemen: 'Mr. Elmer Brillantes', ladies: 'Mrs. Buenafe Marasigan' },
+      { gentlemen: 'Mr. Jerwell Encina', ladies: 'Mrs. Emily Encina' },
+      { gentlemen: 'Mr. Jesus Bautista', ladies: 'Mrs. Ester Ariete' },
+      { gentlemen: 'Mr. John Itto Chua III', ladies: 'Mrs. Aileen Padua' },
+      { gentlemen: 'Mr. Jose Alimorom', ladies: 'Mrs. Krystel Len Exconde' },
+      { gentlemen: 'Mr. Rommel Gonzales', ladies: 'Mrs. Lorna Villasenor' },
+    ],
+    bestMan: 'Mr. Russel De Mata',
+    maidOfHonor: 'Ms. Cholyn Axel Cabello',
+    secondarySponsors: [
+      { role: 'Candle', pair: 'Mr. Laj Christian Bautista & Ms. Kristine Naling' },
+      { role: 'Cord', pair: 'Mr. Yajnyl Bautista & Ms. Girlie Dueñas' },
+      { role: 'Veil', pair: 'Mr. Regi Rajine Bautista & Ms. Jezzelle Seredilla' },
+    ],
+    bearers: [
+      { role: 'Ring Bearer', name: 'Nicholas Cardama' },
+      { role: 'Coin Bearer', name: 'Kenshin Flores' },
+      { role: 'Bible Bearer', name: 'King Raiden Lechuga' },
+    ],
+    flowerGirls: [
+      'Khloe Adrianne Alimorom',
+      'Keily Jedidiah Colico',
+    ],
   },
   socials: [
     { label: 'Facebook', url: 'https://facebook.com/wcachero', icon: 'facebook' },

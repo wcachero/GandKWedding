@@ -1307,12 +1307,186 @@
   min-width: 11rem;
 }
 
+/* ----- Entourage (floral card, two-column names) ------------------------- */
+.entourage {
+  position: relative;
+  text-align: center;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255, 248, 239, 0.9), transparent 65%),
+    linear-gradient(180deg, #f7ebe3 0%, #f3e0d4 45%, #ecd4c4 100%);
+  overflow: hidden;
+
+  &__card {
+    position: relative;
+    z-index: 1;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0;
+  }
+
+  &__floral {
+    position: absolute;
+    z-index: 3;
+    /* Flower-only crops are taller (trailing sprigs); keep width modest */
+    width: clamp(4.75rem, 16vw, 7rem);
+    height: auto;
+    pointer-events: none;
+    user-select: none;
+
+    &--tr {
+      top: -0.2rem;
+      right: -0.2rem;
+    }
+
+    &--bl {
+      bottom: -0.2rem;
+      left: -0.2rem;
+    }
+  }
+
+  &__frame {
+    position: relative;
+    z-index: 1;
+    padding: clamp(2.75rem, 7vw, 3.75rem) clamp(1.35rem, 4.5vw, 2.75rem);
+    background:
+      linear-gradient(#fbf6f1, #fbf6f1) padding-box,
+      linear-gradient(135deg, rgba(195, 164, 107, 0.95), rgba(227, 163, 121, 0.75), rgba(195, 164, 107, 0.95)) border-box;
+    border: 1.5px solid transparent;
+    box-shadow:
+      inset 0 0 0 6px #fbf6f1,
+      inset 0 0 0 7.5px rgba(195, 164, 107, 0.7),
+      0 18px 40px rgba(94, 70, 53, 0.1);
+  }
+
+  &__cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(1.25rem, 4vw, 2.5rem);
+    margin-bottom: clamp(1.75rem, 4vw, 2.35rem);
+    align-items: start;
+
+    &--bearers,
+    &--secondary {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(0.85rem, 3vw, 1.5rem);
+    }
+  }
+
+  &__block {
+    min-width: 0;
+
+    &--full {
+      margin-bottom: clamp(1.75rem, 4vw, 2.35rem);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  &__role {
+    font-family: var(--font-ui);
+    text-transform: uppercase;
+    letter-spacing: 0.26em;
+    font-size: clamp(0.66rem, 0.6rem + 0.25vw, 0.76rem);
+    font-weight: 600;
+    color: #6e5224;
+    margin: 0 0 0.35rem;
+  }
+
+  &__flourish {
+    display: block;
+    width: min(7.5rem, 70%);
+    height: auto;
+    margin: 0 auto 0.85rem;
+    opacity: 0.85;
+  }
+
+  &__name {
+    font-family: var(--font-heading);
+    font-size: clamp(1.05rem, 0.95rem + 0.4vw, 1.28rem);
+    font-weight: 500;
+    color: #3f2a1c;
+    line-height: 1.5;
+    margin: 0 0 0.25rem;
+  }
+
+  &__sponsors {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: clamp(1rem, 4vw, 2.25rem);
+    row-gap: 0.3rem;
+    max-width: 620px;
+    margin-inline: auto;
+  }
+
+  @media (max-width: 680px) {
+    &__floral {
+      width: clamp(3.75rem, 22vw, 5.25rem);
+    }
+
+    &__cols {
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+
+      &--bearers,
+      &--secondary {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    &__sponsors {
+      grid-template-columns: 1fr;
+      gap: 0.2rem;
+    }
+
+    &__frame {
+      padding: clamp(1.75rem, 5vw, 2.25rem) clamp(1rem, 4vw, 1.35rem);
+    }
+  }
+}
+
 /* ----- RSVP --------------------------------------------------------------- */
 .rsvp {
   background: var(--color-bg-deep);
   text-align: center;
 
-  &__lead { max-width: 560px; margin: 0 auto var(--space-8); font-size: 1.3rem; font-style: italic; color: var(--color-text); }
+  &__lead { max-width: 560px; margin: 0 auto var(--space-4); font-size: 1.3rem; font-style: italic; color: var(--color-text); }
+
+  &__deadline {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    max-width: 420px;
+    margin: 0 auto var(--space-8);
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid rgba(227, 163, 121, 0.55);
+    border-radius: 4px;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(255, 248, 239, 0.72) 0%,
+        rgba(227, 163, 121, 0.16) 100%
+      );
+  }
+
+  &__deadline-label {
+    font-family: var(--font-ui);
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-size: 0.64rem;
+    font-weight: 600;
+    color: #6e5224;
+  }
+
+  &__deadline-date {
+    font-family: var(--font-heading);
+    font-size: clamp(1.35rem, 1.15rem + 0.8vw, 1.75rem);
+    font-weight: 600;
+    color: #3f2a1c;
+    letter-spacing: 0.04em;
+  }
 
   &__form {
     max-width: min(720px, 100%);
@@ -1600,6 +1774,17 @@
     font-size: 0.82rem;
     color: var(--color-accent-deep);
     word-break: break-all;
+  }
+
+  &__download {
+    margin-top: var(--space-5);
+    width: 100%;
+
+    &:disabled {
+      opacity: 0.65;
+      cursor: wait;
+      transform: none;
+    }
   }
 }
 
