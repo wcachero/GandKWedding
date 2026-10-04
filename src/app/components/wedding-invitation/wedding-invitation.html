@@ -405,7 +405,30 @@
       </div>
     </div>
   </section>
+
+  <!-- Triggers the RSVP deadline notice when the guest reaches the bottom -->
+  <div class="invite__end" aria-hidden="true"></div>
 </article>
+
+<!-- RSVP deadline notice (shows once after scrolling to the bottom) -->
+@if (rsvpDeadlineOpen()) {
+  <div class="rsvp-notice" (click)="dismissRsvpDeadline()" role="dialog" aria-modal="true"
+       aria-labelledby="rsvp-notice-title">
+    <div class="rsvp-notice__card" (click)="$event.stopPropagation()">
+      <button type="button" class="rsvp-notice__close" aria-label="Close"
+              (click)="dismissRsvpDeadline()">&times;</button>
+      <p class="rsvp-notice__kicker">Kind reminder</p>
+      <h3 class="rsvp-notice__title" id="rsvp-notice-title">RSVP Deadline</h3>
+      <p class="rsvp-notice__date">{{ wedding.rsvp.deadline }}</p>
+      <p class="rsvp-notice__body">
+        Please confirm your attendance on or before this date so we can reserve your seat with care.
+      </p>
+      <button type="button" class="btn rsvp-notice__cta" (click)="goToRsvpFromNotice()">
+        Go to RSVP
+      </button>
+    </div>
+  </div>
+}
 
 <!-- Share chooser -->
 @if (shareOpen()) {

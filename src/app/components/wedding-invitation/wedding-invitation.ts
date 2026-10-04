@@ -442,6 +442,7 @@ export class WeddingInvitation {
     afterNextRender(() => {
       this.setupAutoHideNav();
       this.hydrateGalleryImageStates();
+      this.setupRsvpDeadlineNotice();
 
       const url = `${window.location.origin}/`;
       this.shareUrl.set(url);
@@ -450,6 +451,54 @@ export class WeddingInvitation {
         .then((data) => this.qrDataUrl.set(data))
         .catch(() => this.qrDataUrl.set(null));
     });
+  }
+
+  /** Bottom-of-page RSVP deadline warning — shown once per visit. */
+  protected readonly rsvpDeadlineOpen = signal(false);
+  private static readonly RSVP_NOTICE_KEY = 'gk-rsvp-deadline-seen';
+
+  protected dismissRsvpDeadline(): void {
+    this.rsvpDeadlineOpen.set(false);
+    try {
+      sessionStorage.setItem(WeddingInvitation.RSVP_NOTICE_KEY, '1');
+    } catch {
+      /* private mode / blocked storage */
+    }
+  }
+
+  protected goToRsvpFromNotice(): void {
+    this.dismissRsvpDeadline();
+    document.getElementById('rsvp')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  /** Open the deadline notice the first time the guest reaches the invitation end. */
+  private setupRsvpDeadlineNotice(): void {
+    try {
+      if (sessionStorage.getItem(WeddingInvitation.RSVP_NOTICE_KEY) === '1') {
+        return;
+      }
+    } catch {
+      /* continue without persistence */
+    }
+
+    const end = this.host.nativeElement.querySelector('.invite__end') as HTMLElement | null;
+    if (!end || typeof IntersectionObserver === 'undefined') {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) {
+          return;
+        }
+        this.rsvpDeadlineOpen.set(true);
+        observer.disconnect();
+      },
+      { root: null, threshold: 0.35 },
+    );
+
+    observer.observe(end);
+    this.destroyRef.onDestroy(() => observer.disconnect());
   }
 
   /** QR with nav logo composited in the centre (high error correction). */
