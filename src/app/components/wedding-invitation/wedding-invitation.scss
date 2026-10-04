@@ -1251,24 +1251,11 @@
     overflow: hidden;
   }
 
-  &__floral {
-    position: absolute;
-    z-index: 3;
-    width: clamp(3.85rem, 22vw, 10rem);
-    max-width: 34%;
-    height: auto;
-    pointer-events: none;
-    user-select: none;
-
-    &--tr { top: 0; right: 0; }
-    &--bl { bottom: 0; left: 0; }
-  }
-
   &__frame {
     position: relative;
     z-index: 1;
     overflow: hidden;
-    padding: clamp(1.7rem, 5vw, 2.85rem) clamp(0.4rem, 2vw, 1.5rem) clamp(1.55rem, 4.5vw, 2.65rem);
+    padding: clamp(1.35rem, 3.5vw, 2.25rem) clamp(0.4rem, 2vw, 1.5rem);
     background:
       linear-gradient(#fbf6f1, #fbf6f1) padding-box,
       linear-gradient(135deg, rgba(195, 164, 107, 0.95), rgba(227, 163, 121, 0.75), rgba(195, 164, 107, 0.95)) border-box;
@@ -1283,23 +1270,28 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: clamp(0.35rem, 2vw, 1.5rem);
-    margin-bottom: clamp(1.15rem, 3vw, 1.85rem);
+    margin-bottom: clamp(1.75rem, 4vw, 2.5rem);
+    padding-bottom: clamp(0.35rem, 1vw, 0.6rem);
     align-items: start;
+
+    .entourage__block {
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
   }
 
   &__block {
     min-width: 0;
+    margin-bottom: clamp(1.75rem, 4vw, 2.5rem);
+    padding-bottom: clamp(0.35rem, 1vw, 0.6rem);
 
-    &--full {
-      margin-bottom: clamp(1.35rem, 4vw, 2.35rem);
-      &:last-child { margin-bottom: 0; }
+    &:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
     }
 
     &--flower-girls {
-      margin-bottom: clamp(1.35rem, 4vw, 2.25rem);
-
-      .entourage__name { margin-bottom: clamp(1.1rem, 3.5vw, 2rem); }
-      &:last-child { margin-bottom: clamp(1.35rem, 4vw, 2.25rem); }
+      .entourage__name { margin-bottom: clamp(0.85rem, 2.5vw, 1.5rem); }
     }
 
     &--pair .entourage__flourish {
