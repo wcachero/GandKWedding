@@ -437,32 +437,57 @@
     <div class="invite-preview__card" (click)="$event.stopPropagation()">
       <button type="button" class="invite-preview__close" aria-label="Close"
               (click)="closeInvitePreview()">&times;</button>
-      <h3 class="invite-preview__title" id="invite-preview-title">Save Invitation</h3>
+      <h3 class="invite-preview__title" id="invite-preview-title">Save image</h3>
       <p class="invite-preview__hint">
-        @if (invitePreviewIsAndroid()) {
-          On Android Messenger, tap <strong>Share / Save</strong> then choose
-          <strong>Photos</strong>, <strong>Drive</strong>, or <strong>Downloads</strong>.
-          Long-press usually does not work here.
+        @if (invitePreviewIsMessenger()) {
+          Tap <strong>Save image</strong> and choose Photos, Gallery, or Drive.
+          If Messenger blocks it, tap <strong>Open in Chrome</strong> and save once there.
         } @else {
-          Press and hold the image to Save Image, or tap Share / Save below.
+          Press and hold the image to Save Image, or tap Save image below.
         }
       </p>
+      @if (inviteSaveBlocked()) {
+        <p class="invite-preview__hint">This app blocked the save. Open in Chrome, then tap Save image.</p>
+      }
       <div class="invite-preview__frame">
         <img class="invite-preview__img" [src]="preview" alt="Wedding invitation card" />
       </div>
       <div class="invite-preview__actions">
-        <button type="button" class="btn invite-preview__share" (click)="shareInvitePreview()">
-          Share / Save
+        <button type="button" class="btn invite-preview__share" (click)="saveInvitePreview()">
+          Save image
         </button>
         <a
           class="btn invite-preview__download"
-          [href]="preview"
+          [href]="invitePreviewBlobUrl() || preview"
           [attr.download]="invitePreviewFilename()"
-          rel="noopener"
-          (click)="downloadInvitePreview($event)">
-          Download Image
+          target="_blank"
+          rel="noopener">
+          Download
         </a>
+        @if (invitePreviewIsMessenger()) {
+          <button type="button" class="btn invite-preview__download" (click)="openSaveInChrome()">
+            Open in Chrome
+          </button>
+        }
       </div>
+    </div>
+  </div>
+}
+
+@if (chromeSaveKind(); as kind) {
+  <div class="invite-preview" role="dialog" aria-modal="true" aria-labelledby="chrome-save-title">
+    <div class="invite-preview__card">
+      <h3 class="invite-preview__title" id="chrome-save-title">
+        {{ kind === 'qr' ? 'Save QR code' : 'Save invitation' }}
+      </h3>
+      <p class="invite-preview__hint">Tap below to save the image to your phone.</p>
+      <button
+        type="button"
+        class="btn invite-preview__share"
+        (click)="confirmChromeSave()"
+        [disabled]="!chromeSaveReady()">
+        {{ chromeSaveReady() ? 'Save image' : 'Preparing…' }}
+      </button>
     </div>
   </div>
 }

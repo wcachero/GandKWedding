@@ -455,6 +455,16 @@ export class WeddingInvitation {
       this.buildBrandedQrDataUrl(url)
         .then((data) => this.qrDataUrl.set(data))
         .catch(() => this.qrDataUrl.set(null));
+
+      // Opened from Messenger's "Open in Chrome" so a real tap can save the file.
+      const save = new URLSearchParams(window.location.search).get('save');
+      if ((save === 'invite' || save === 'qr') && !this.isRestrictedInAppBrowser()) {
+        this.chromeSaveKind.set(save);
+        const clean = new URL(window.location.href);
+        clean.searchParams.delete('save');
+        history.replaceState({}, '', `${clean.pathname}${clean.search}${clean.hash}`);
+        void this.prepareChromeSave(save);
+      }
     });
   }
 
@@ -618,9 +628,18 @@ export class WeddingInvitation {
 
   /** Preview shown when in-app browsers (Messenger, etc.) block direct downloads. */
   protected readonly invitePreviewUrl = signal<string | null>(null);
+  protected readonly invitePreviewBlobUrl = signal<string | null>(null);
   protected readonly invitePreviewFilename = signal('wedding-invitation.jpg');
-  /** Android Messenger often blocks long-press save — guide users to tap Share/Download. */
-  protected readonly invitePreviewIsAndroid = signal(false);
+  /** Android Messenger blocks <a download> and long-press save. */
+  protected readonly invitePreviewIsMessenger = signal(false);
+  /** Set when Messenger rejects the share sheet so we point guests to Chrome. */
+  protected readonly inviteSaveBlocked = signal(false);
+  /** Chrome opened with ?save= so one tap can download outside Messenger. */
+  protected readonly chromeSaveKind = signal<'invite' | 'qr' | null>(null);
+  protected readonly chromeSaveReady = signal(false);
+  private chromeSaveDataUrl: string | null = null;
+  private chromeSaveFilename = '';
+  private invitePreviewFile: File | null = null;
 
   protected async downloadInvitationImage(): Promise<void> {
     if (this.inviteDownloading()) {
@@ -644,35 +663,89 @@ export class WeddingInvitation {
   }
 
   protected closeInvitePreview(): void {
+    this.revokePreviewBlob();
     this.invitePreviewUrl.set(null);
+    this.inviteSaveBlocked.set(false);
+    this.invitePreviewIsMessenger.set(false);
     this.unlockBackgroundScroll();
   }
 
-  protected async shareInvitePreview(): Promise<void> {
-    const dataUrl = this.invitePreviewUrl();
-    if (!dataUrl) {
+  /**
+   * Called from a fresh tap. The file is already built, so share() stays
+   * inside the user gesture — required for Android Messenger's share sheet.
+   */
+  protected saveInvitePreview(): void {
+    const file = this.invitePreviewFile;
+    const nav = navigator as Navigator & {
+      share?: (data: ShareData) => Promise<void>;
+    };
+    if (!file || !nav.share) {
+      this.inviteSaveBlocked.set(true);
       return;
     }
-    const filename = this.invitePreviewFilename();
-    const title = `${this.wedding.groom} & ${this.wedding.bride} Wedding Invitation`;
-    const shared = await this.tryNativeImageShare(dataUrl, filename, title);
-    if (shared) {
-      this.closeInvitePreview();
-      return;
-    }
-    // Fresh tap: data-URL download is the most reliable Android Messenger fallback.
-    this.triggerDataUrlDownload(dataUrl, filename);
+    const title = this.invitePreviewShareTitle();
+    void nav
+      .share({ files: [file], title, text: title })
+      .then(() => this.closeInvitePreview())
+      .catch((err: Error) => {
+        if (err?.name === 'AbortError') {
+          return;
+        }
+        this.inviteSaveBlocked.set(true);
+      });
   }
 
-  /** User-tapped download — data URLs work more often than blob: in Android Messenger. */
-  protected downloadInvitePreview(event?: Event): void {
-    event?.preventDefault();
-    event?.stopPropagation();
-    const dataUrl = this.invitePreviewUrl();
-    if (!dataUrl) {
+  /** Leave Messenger and reopen this page in Chrome, where downloads work. */
+  protected openSaveInChrome(): void {
+    const kind = this.invitePreviewFilename().includes('-qr') ? 'qr' : 'invite';
+    const url = new URL(window.location.href);
+    url.searchParams.set('save', kind);
+    url.hash = '';
+    const httpsUrl = url.toString();
+    if (!/^https:/i.test(httpsUrl)) {
+      this.inviteSaveBlocked.set(true);
       return;
     }
-    this.triggerDataUrlDownload(dataUrl, this.invitePreviewFilename());
+    const withoutScheme = httpsUrl.replace(/^https:\/\//, '');
+    window.location.href =
+      `intent://${withoutScheme}#Intent;scheme=https;package=com.android.chrome;` +
+      `S.browser_fallback_url=${encodeURIComponent(httpsUrl)};end`;
+  }
+
+  /** One tap in Chrome (after the Messenger handoff) actually saves the file. */
+  protected confirmChromeSave(): void {
+    const dataUrl = this.chromeSaveDataUrl;
+    const filename = this.chromeSaveFilename;
+    if (!dataUrl || !filename) {
+      return;
+    }
+    // Must run synchronously in this tap — Chrome blocks downloads after an await.
+    this.triggerDataUrlDownload(dataUrl, filename);
+    this.chromeSaveKind.set(null);
+    this.chromeSaveReady.set(false);
+  }
+
+  private async prepareChromeSave(kind: 'invite' | 'qr'): Promise<void> {
+    try {
+      if (kind === 'qr') {
+        let qr = this.qrDataUrl();
+        for (let i = 0; i < 30 && !qr; i++) {
+          await new Promise((resolve) => setTimeout(resolve, 150));
+          qr = this.qrDataUrl();
+        }
+        if (!qr) {
+          return;
+        }
+        this.chromeSaveDataUrl = await this.buildDownloadableQrCard(qr);
+        this.chromeSaveFilename = `${this.wedding.groom.toLowerCase()}-${this.wedding.bride.toLowerCase()}-wedding-invitation-qr.jpg`;
+      } else {
+        this.chromeSaveDataUrl = await this.buildInvitationKeepsake('image/jpeg', 0.82);
+        this.chromeSaveFilename = `${this.wedding.groom.toLowerCase()}-${this.wedding.bride.toLowerCase()}-wedding-invitation.jpg`;
+      }
+      this.chromeSaveReady.set(true);
+    } catch {
+      this.chromeSaveReady.set(false);
+    }
   }
 
   /**
@@ -683,45 +756,61 @@ export class WeddingInvitation {
     dataUrl: string,
     filename: string,
     title: string,
-    fromPreview = false,
   ): Promise<void> {
     const restricted = this.isRestrictedInAppBrowser();
-    const android = /Android/i.test(navigator.userAgent || '');
 
-    // 1) Native share with the image file (best path on phones).
-    //    On Android Messenger, ignore canShare() — it often lies and blocks a working share.
+    // Messenger Android ignores <a download> and drops the gesture during canvas
+    // work. Show the image first; Save / Open in Chrome run on a new tap.
+    if (this.isAndroidMessenger()) {
+      await this.openImagePreview(dataUrl, filename);
+      return;
+    }
+
     const shared = await this.tryNativeImageShare(dataUrl, filename, title, {
-      skipCanShareCheck: android || restricted,
+      skipCanShareCheck: restricted,
     });
     if (shared) {
-      if (fromPreview) {
-        this.closeInvitePreview();
-      }
       return;
     }
 
-    // 2) Direct download outside in-app browsers.
     if (!restricted) {
       this.triggerDataUrlDownload(dataUrl, filename);
-      if (fromPreview) {
-        this.closeInvitePreview();
-      }
       return;
     }
 
-    // 3) Android Messenger: try an immediate data-URL download while we still
-    //    have the original tap context, then show preview with tap actions.
-    if (android && !fromPreview) {
-      this.triggerDataUrlDownload(dataUrl, filename);
-    }
+    await this.openImagePreview(dataUrl, filename);
+  }
 
-    // 4) Preview UI — keep a data: URL (not blob:) so Download can work on tap.
+  private async openImagePreview(dataUrl: string, filename: string): Promise<void> {
+    this.revokePreviewBlob();
+    const file = await this.dataUrlToFile(dataUrl, filename);
+    this.invitePreviewFile = file;
+    this.invitePreviewBlobUrl.set(URL.createObjectURL(file));
     this.invitePreviewFilename.set(filename);
-    this.invitePreviewIsAndroid.set(android);
+    this.invitePreviewIsMessenger.set(this.isAndroidMessenger());
+    this.inviteSaveBlocked.set(false);
     this.invitePreviewUrl.set(dataUrl);
-    if (!fromPreview) {
-      this.lockBackgroundScroll();
+    this.lockBackgroundScroll();
+  }
+
+  private revokePreviewBlob(): void {
+    const url = this.invitePreviewBlobUrl();
+    if (url) {
+      URL.revokeObjectURL(url);
     }
+    this.invitePreviewBlobUrl.set(null);
+    this.invitePreviewFile = null;
+  }
+
+  private invitePreviewShareTitle(): string {
+    const who = `${this.wedding.groom} & ${this.wedding.bride}`;
+    return this.invitePreviewFilename().includes('-qr') ? `${who} Wedding QR` : `${who} Wedding Invitation`;
+  }
+
+  private isAndroidMessenger(): boolean {
+    const ua = navigator.userAgent || '';
+    // Messenger's Android webview reports FB_IAB / FBAV (sometimes "Orca"), not "Messenger".
+    return /Android/i.test(ua) && /FBAN|FBAV|FB_IAB|FB4A|Messenger|Orca/i.test(ua);
   }
 
   private async tryNativeImageShare(
@@ -1197,7 +1286,7 @@ export class WeddingInvitation {
     this.qrDownloading.set(true);
     try {
       const dataUrl = await this.buildDownloadableQrCard(qr);
-      const filename = `${this.wedding.groom.toLowerCase()}-${this.wedding.bride.toLowerCase()}-wedding-invitation-qr.png`;
+      const filename = `${this.wedding.groom.toLowerCase()}-${this.wedding.bride.toLowerCase()}-wedding-invitation-qr.jpg`;
       await this.saveOrShareImage(
         dataUrl,
         filename,
@@ -1304,7 +1393,7 @@ export class WeddingInvitation {
     ctx.font = '600 20px Cinzel, serif';
     ctx.fillText(this.wedding.monogram, width / 2, 1320);
 
-    return canvas.toDataURL('image/png');
+    return canvas.toDataURL('image/jpeg', 0.92);
   }
 
   private drawGoldRule(ctx: CanvasRenderingContext2D, cx: number, y: number, halfWidth: number): void {

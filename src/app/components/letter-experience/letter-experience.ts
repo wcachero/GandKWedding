@@ -134,7 +134,14 @@ export class LetterExperience {
   protected readonly showBack = computed(() => this.stage() === 'open');
 
   constructor() {
-    afterNextRender(() => this.setupOverscrollReturn());
+    afterNextRender(() => {
+      this.setupOverscrollReturn();
+      // Chrome handoff from Messenger: skip the envelope and land on the invitation.
+      const save = new URLSearchParams(window.location.search).get('save');
+      if (save === 'invite' || save === 'qr') {
+        this.stage.set('reading');
+      }
+    });
   }
 
   /**
