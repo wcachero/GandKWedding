@@ -406,13 +406,13 @@
 
       <div class="share__download" appReveal>
         <p class="share__download-label">Download Invitation</p>
-        <p class="share__download-hint">Save a keepsake card to share offline</p>
+        <p class="share__download-hint">Save or share a keepsake card (works in Messenger too)</p>
         <button
           type="button"
           class="btn share__download-btn"
           (click)="downloadInvitationImage()"
           [disabled]="inviteDownloading()">
-          {{ inviteDownloading() ? 'Preparing…' : 'Download Image' }}
+          {{ inviteDownloading() ? 'Preparing…' : 'Save / Share Image' }}
         </button>
       </div>
     </div>
@@ -421,6 +421,25 @@
   <!-- Triggers the RSVP deadline notice when the guest reaches the bottom -->
   <div class="invite__end" aria-hidden="true"></div>
 </article>
+
+<!-- Invitation image preview — fallback when Messenger / in-app browsers block downloads -->
+@if (invitePreviewUrl(); as preview) {
+  <div class="invite-preview" (click)="closeInvitePreview()" role="dialog" aria-modal="true"
+       aria-labelledby="invite-preview-title">
+    <div class="invite-preview__card" (click)="$event.stopPropagation()">
+      <button type="button" class="invite-preview__close" aria-label="Close"
+              (click)="closeInvitePreview()">&times;</button>
+      <h3 class="invite-preview__title" id="invite-preview-title">Save Invitation</h3>
+      <p class="invite-preview__hint">Press and hold the image, then choose Save Image. Or tap Share below.</p>
+      <div class="invite-preview__frame">
+        <img class="invite-preview__img" [src]="preview" alt="Wedding invitation card" />
+      </div>
+      <button type="button" class="btn invite-preview__share" (click)="shareInvitePreview()">
+        Share / Save
+      </button>
+    </div>
+  </div>
+}
 
 <!-- RSVP deadline notice (shows once after scrolling to the bottom) -->
 @if (rsvpDeadlineOpen()) {
@@ -522,7 +541,7 @@
         class="btn qr-modal__download"
         (click)="downloadQr()"
         [disabled]="!qrDataUrl() || qrDownloading()">
-        {{ qrDownloading() ? 'Preparing…' : 'Download QR' }}
+        {{ qrDownloading() ? 'Preparing…' : 'Save / Share QR' }}
       </button>
     </div>
   </div>
