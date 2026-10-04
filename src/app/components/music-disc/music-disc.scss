@@ -3,6 +3,9 @@
   position: relative;
   z-index: 6;
   will-change: transform;
+  max-width: 100%;
+  /* Keep marquee/drag transforms from expanding Messenger document width */
+  contain: layout style;
 }
 
 :host(.music-disc--dragging) {

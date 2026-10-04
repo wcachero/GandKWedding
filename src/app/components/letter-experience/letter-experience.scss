@@ -1,5 +1,9 @@
 :host {
   display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 .scene {
@@ -11,7 +15,11 @@
   padding: var(--space-16) var(--space-6) var(--space-8);
   background:
     radial-gradient(120% 90% at 50% 0%, var(--color-bg) 0%, var(--color-bg-deep) 100%);
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-x: clip;
+  overflow-y: hidden;
+  width: 100%;
+  max-width: 100%;
 
   /* Photo backdrop for the sealed + opened envelope steps */
   &[data-stage='sealed'],
@@ -19,36 +27,49 @@
     display: block;
     padding: 0;
     place-items: initial;
-    overflow: visible;
+    /* Never leave X open — Messenger WebView expands document from scaled bg */
+    overflow-x: hidden;
+    overflow-x: clip;
+    overflow-y: hidden;
     background: #1a1810;
     min-height: 100vh;
     min-height: 100dvh;
+    width: 100%;
+    max-width: 100%;
 
     .scene__content {
       position: relative;
       z-index: 1;
       align-self: auto;
       width: 100%;
+      max-width: 100%;
       min-height: 100vh;
       min-height: 100dvh;
       display: flex;
       flex-direction: column;
       align-items: stretch;
+      overflow-x: hidden;
+      overflow-x: clip;
     }
 
     .scene__stage-bg {
       position: fixed;
       inset: 0;
       width: 100%;
+      max-width: 100%;
       height: 100vh;
       height: 100dvh;
+      overflow: hidden;
     }
 
     .scene__stage-bg-photo {
       object-fit: cover;
       object-position: 56% center;
+      /* Keep scaled photo inside the clipped stage bg */
       transform: scale(1.06);
+      transform-origin: center center;
       filter: contrast(1.12) saturate(0.78) brightness(0.88);
+      max-width: none; /* cover needs to exceed box; parent clips */
     }
 
     @media (max-width: 768px) {
@@ -117,9 +138,14 @@
     align-items: center;
     gap: 0;
     margin: 0;
-    padding: calc(env(safe-area-inset-top, 0px) + 0.15rem) var(--space-6) var(--space-4);
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: calc(env(safe-area-inset-top, 0px) + 0.15rem) clamp(0.85rem, 4vw, var(--space-6)) var(--space-4);
     text-align: center;
     color: #f4ead6;
+    overflow-x: hidden;
+    overflow-x: clip;
     text-shadow:
       0 1px 1px rgba(8, 6, 4, 0.55),
       0 8px 28px rgba(8, 6, 4, 0.45);
@@ -144,7 +170,13 @@
       letter-spacing: 0.42em;
       text-transform: uppercase;
       color: #e7d8bc;
+      max-width: 100%;
+      overflow-wrap: anywhere;
       animation: invite-fade-up 0.9s ease 1.15s both;
+
+      @media (max-width: 420px) {
+        letter-spacing: 0.22em;
+      }
     }
 
     &-kicker::before {
@@ -164,7 +196,14 @@
       letter-spacing: 0.14em;
       line-height: 1.08;
       text-transform: uppercase;
+      max-width: 100%;
+      overflow-wrap: anywhere;
       animation: invite-fade-up 0.9s ease 0.22s both;
+
+      @media (max-width: 420px) {
+        letter-spacing: 0.08em;
+        font-size: clamp(1.75rem, 8.5vw, 2.1rem);
+      }
     }
 
     @media (min-width: 769px) {
@@ -284,7 +323,7 @@
       left: auto;
       right: 1rem;
       bottom: calc(env(safe-area-inset-bottom, 0px) + 0.55rem + 3px);
-      max-width: none;
+      max-width: calc(100% - 2rem);
     }
   }
 
@@ -323,7 +362,11 @@
     display: block;
     place-items: initial;
     padding: 0;
-    overflow: visible;
+    overflow-x: hidden;
+    overflow-x: clip;
+    overflow-y: visible;
+    width: 100%;
+    max-width: 100%;
     background: #f6efe6;
 
     /* Keep invitation above the footer so parallax/footer layers never cover content. */
@@ -332,6 +375,10 @@
       position: relative;
       z-index: 2;
       isolation: isolate;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+      overflow-x: clip;
       background: #f6efe6;
     }
 
@@ -341,6 +388,9 @@
       margin-top: 0;
       display: block;
       width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+      overflow-x: clip;
     }
   }
 }
@@ -350,6 +400,9 @@
   bottom: clamp(var(--space-4), 3vw, var(--space-8));
   right: clamp(var(--space-4), 3vw, var(--space-8));
   z-index: 35;
+  max-width: calc(100% - 1rem);
+  /* Prevent drag/transform from widening the document in Messenger WebView */
+  contain: layout;
 }
 
 .scene[data-stage='open'] .scene__music {
@@ -371,6 +424,9 @@
   left: 0;
   right: 0;
   bottom: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   z-index: 30;
   height: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px));
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -379,6 +435,7 @@
   justify-content: center;
   gap: clamp(0.1rem, 1.5vw, 0.75rem);
   isolation: isolate;
+  overflow: hidden;
   background: linear-gradient(
     180deg,
     rgba(255, 248, 230, 0.42) 0%,
@@ -496,6 +553,9 @@
   font-size: 0.62rem;
   color: var(--color-text-muted);
   background: var(--color-bg-deep);
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
 }
 
 .scene[data-stage='reading'] .overscroll-hint {
