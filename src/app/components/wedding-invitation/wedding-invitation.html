@@ -430,13 +430,30 @@
       <button type="button" class="invite-preview__close" aria-label="Close"
               (click)="closeInvitePreview()">&times;</button>
       <h3 class="invite-preview__title" id="invite-preview-title">Save Invitation</h3>
-      <p class="invite-preview__hint">Press and hold the image, then choose Save Image. Or tap Share below.</p>
+      <p class="invite-preview__hint">
+        @if (invitePreviewIsAndroid()) {
+          On Android Messenger, long-press usually does not work. Tap <strong>Share / Save</strong> below, then choose Photos or Downloads.
+        } @else {
+          Press and hold the image to Save Image, or tap Share / Save below.
+        }
+      </p>
       <div class="invite-preview__frame">
         <img class="invite-preview__img" [src]="preview" alt="Wedding invitation card" />
       </div>
-      <button type="button" class="btn invite-preview__share" (click)="shareInvitePreview()">
-        Share / Save
-      </button>
+      <div class="invite-preview__actions">
+        <button type="button" class="btn invite-preview__share" (click)="shareInvitePreview()">
+          Share / Save
+        </button>
+        <a
+          class="btn invite-preview__download"
+          [href]="preview"
+          [attr.download]="invitePreviewFilename()"
+          target="_blank"
+          rel="noopener"
+          (click)="$event.stopPropagation()">
+          Download Image
+        </a>
+      </div>
     </div>
   </div>
 }

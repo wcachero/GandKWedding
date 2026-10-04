@@ -466,11 +466,14 @@ export class WeddingInvitation {
     } catch {
       /* private mode / blocked storage */
     }
+    // Always land on RSVP after the deadline notice closes.
+    queueMicrotask(() => {
+      document.getElementById('rsvp')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   }
 
   protected goToRsvpFromNotice(): void {
     this.dismissRsvpDeadline();
-    document.getElementById('rsvp')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   /** Open the deadline notice the first time the guest reaches the invitation end. */
@@ -610,7 +613,9 @@ export class WeddingInvitation {
 
   /** Preview shown when in-app browsers (Messenger, etc.) block direct downloads. */
   protected readonly invitePreviewUrl = signal<string | null>(null);
-  private invitePreviewFilename = 'wedding-invitation.png';
+  protected readonly invitePreviewFilename = signal('wedding-invitation.jpg');
+  /** Android Messenger often blocks long-press save — guide users to tap Share/Download. */
+  protected readonly invitePreviewIsAndroid = signal(false);
 
   protected async downloadInvitationImage(): Promise<void> {
     if (this.inviteDownloading()) {
@@ -618,9 +623,14 @@ export class WeddingInvitation {
     }
     this.inviteDownloading.set(true);
     try {
-      const dataUrl = await this.buildInvitationKeepsake();
-      const filename = `${this.wedding.groom.toLowerCase()}-${this.wedding.bride.toLowerCase()}-wedding-invitation.png`;
-      await this.saveOrShareImage(dataUrl, filename, `${this.wedding.groom} & ${this.wedding.bride} Wedding Invitation`);
+      // JPEG keeps Messenger/iOS share + preview thumbnails reliable (PNG data-URLs are too heavy).
+      const dataUrl = await this.buildInvitationKeepsake('image/jpeg', 0.88);
+      const filename = `${this.wedding.groom.toLowerCase()}-${this.wedding.bride.toLowerCase()}-wedding-invitation.jpg`;
+      await this.saveOrShareImage(
+        dataUrl,
+        filename,
+        `${this.wedding.groom} & ${this.wedding.bride} Wedding Invitation`,
+      );
     } catch {
       /* keep the page usable if canvas/fonts fail */
     } finally {
@@ -629,25 +639,76 @@ export class WeddingInvitation {
   }
 
   protected closeInvitePreview(): void {
+    const prev = this.invitePreviewUrl();
     this.invitePreviewUrl.set(null);
+    if (prev?.startsWith('blob:')) {
+      URL.revokeObjectURL(prev);
+    }
     this.unlockBackgroundScroll();
   }
 
   protected async shareInvitePreview(): Promise<void> {
-    const dataUrl = this.invitePreviewUrl();
-    if (!dataUrl) {
+    const url = this.invitePreviewUrl();
+    if (!url) {
       return;
     }
-    await this.saveOrShareImage(
-      dataUrl,
-      this.invitePreviewFilename,
-      `${this.wedding.groom} & ${this.wedding.bride} Wedding Invitation`,
-      true,
-    );
+    const filename = this.invitePreviewFilename();
+    const title = `${this.wedding.groom} & ${this.wedding.bride} Wedding Invitation`;
+    const file = await this.dataUrlToFile(url, filename);
+    const nav = navigator as Navigator & {
+      share?: (data: ShareData) => Promise<void>;
+      canShare?: (data: ShareData) => boolean;
+    };
+
+    // Fresh user gesture: try file share first (Save to Photos / Downloads on Android).
+    const fileShare: ShareData = { files: [file], title, text: title };
+    if (nav.share && (!nav.canShare || nav.canShare(fileShare))) {
+      try {
+        await nav.share(fileShare);
+        this.closeInvitePreview();
+        return;
+      } catch (err) {
+        if ((err as Error)?.name === 'AbortError') {
+          return;
+        }
+      }
+    }
+
+    // Some Android WebViews accept sharing a URL when files are blocked.
+    if (nav.share) {
+      try {
+        await nav.share({ title, text: title, url });
+        return;
+      } catch (err) {
+        if ((err as Error)?.name === 'AbortError') {
+          return;
+        }
+      }
+    }
+
+    // Last resort: trigger a tapped download / open.
+    this.downloadInvitePreview();
+  }
+
+  /** User-tapped download — works better on Android than long-press in Messenger. */
+  protected downloadInvitePreview(): void {
+    const url = this.invitePreviewUrl();
+    if (!url) {
+      return;
+    }
+    const filename = this.invitePreviewFilename();
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
   }
 
   /**
-   * Save/share a PNG in a way that works on desktop, iOS, Android, and
+   * Save/share an image in a way that works on desktop, iOS, Android, and
    * in-app browsers like Messenger (where `<a download>` is ignored).
    */
   private async saveOrShareImage(
@@ -661,14 +722,17 @@ export class WeddingInvitation {
       share?: (data: ShareData) => Promise<void>;
       canShare?: (data: ShareData) => boolean;
     };
+    const restricted = this.isRestrictedInAppBrowser();
 
-    // 1) Native share sheet with the image file (best on iOS / Android).
+    // 1) On mobile / in-app browsers: prefer native share with the image file
+    //    so the share sheet shows a real thumbnail (Save Image / Messenger / Photos).
     const shareData: ShareData = {
       files: [file],
       title,
       text: title,
     };
-    if (nav.share && (!nav.canShare || nav.canShare(shareData))) {
+    const canShareFiles = !!nav.share && (!nav.canShare || nav.canShare(shareData));
+    if (canShareFiles && (restricted || this.isTouchShareDevice())) {
       try {
         await nav.share(shareData);
         if (fromPreview) {
@@ -679,12 +743,23 @@ export class WeddingInvitation {
         if ((err as Error)?.name === 'AbortError') {
           return;
         }
-        // Fall through to download / preview.
+        // Fall through.
       }
     }
 
     // 2) Direct download when the browser supports it (desktop / Android Chrome).
-    if (!this.isRestrictedInAppBrowser()) {
+    if (!restricted) {
+      // Prefer share-with-files on desktop too when available and download isn't needed.
+      if (canShareFiles && !fromPreview) {
+        try {
+          await nav.share!(shareData);
+          return;
+        } catch (err) {
+          if ((err as Error)?.name === 'AbortError') {
+            return;
+          }
+        }
+      }
       const blobUrl = URL.createObjectURL(file);
       const link = document.createElement('a');
       link.href = blobUrl;
@@ -700,12 +775,21 @@ export class WeddingInvitation {
       return;
     }
 
-    // 3) Messenger / Instagram / etc.: show preview so guests can long-press to save.
-    this.invitePreviewFilename = filename;
-    this.invitePreviewUrl.set(dataUrl);
+    // 3) Messenger / Instagram / etc.: blob preview + tap-to-save actions.
+    this.invitePreviewFilename.set(filename);
+    this.invitePreviewIsAndroid.set(/Android/i.test(navigator.userAgent || ''));
+    const previewUrl = URL.createObjectURL(file);
+    this.invitePreviewUrl.set(previewUrl);
     if (!fromPreview) {
       this.lockBackgroundScroll();
     }
+  }
+
+  private isTouchShareDevice(): boolean {
+    return (
+      (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0) ||
+      (typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)')?.matches === true)
+    );
   }
 
   private isRestrictedInAppBrowser(): boolean {
@@ -718,11 +802,19 @@ export class WeddingInvitation {
   private async dataUrlToFile(dataUrl: string, filename: string): Promise<File> {
     const res = await fetch(dataUrl);
     const blob = await res.blob();
-    return new File([blob], filename, { type: blob.type || 'image/png' });
+    const type =
+      blob.type ||
+      (filename.toLowerCase().endsWith('.jpg') || filename.toLowerCase().endsWith('.jpeg')
+        ? 'image/jpeg'
+        : 'image/png');
+    return new File([blob], filename, { type });
   }
 
-  /** Classic wedding invitation artwork including details + entourage (PNG data URL). */
-  private async buildInvitationKeepsake(): Promise<string> {
+  /** Classic wedding invitation artwork including details + entourage. */
+  private async buildInvitationKeepsake(
+    mimeType: 'image/png' | 'image/jpeg' = 'image/jpeg',
+    quality = 0.88,
+  ): Promise<string> {
     if (document.fonts?.ready) {
       await document.fonts.ready;
     }
@@ -931,11 +1023,15 @@ export class WeddingInvitation {
         } catch {
           /* ignore */
         }
-        return cropped.toDataURL('image/png');
+        return mimeType === 'image/jpeg'
+          ? cropped.toDataURL(mimeType, quality)
+          : cropped.toDataURL(mimeType);
       }
     }
 
-    return canvas.toDataURL('image/png');
+    return mimeType === 'image/jpeg'
+      ? canvas.toDataURL(mimeType, quality)
+      : canvas.toDataURL(mimeType);
   }
 
   /** Compact entourage block for the downloadable invitation image. */

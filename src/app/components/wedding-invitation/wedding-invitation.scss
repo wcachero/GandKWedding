@@ -1913,9 +1913,22 @@
     pointer-events: auto;
   }
 
-  &__share {
-    width: 100%;
+  &__actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
     flex: 0 0 auto;
+  }
+
+  &__share,
+  &__download {
+    width: 100%;
+  }
+
+  &__download {
+    background: transparent;
+    box-shadow: none;
+    text-decoration: none;
   }
 }
 
