@@ -623,8 +623,8 @@ export class WeddingInvitation {
     }
     this.inviteDownloading.set(true);
     try {
-      // JPEG keeps Messenger/iOS share + preview thumbnails reliable (PNG data-URLs are too heavy).
-      const dataUrl = await this.buildInvitationKeepsake('image/jpeg', 0.88);
+      // Slightly smaller JPEG helps Android Messenger share/download succeed.
+      const dataUrl = await this.buildInvitationKeepsake('image/jpeg', 0.82);
       const filename = `${this.wedding.groom.toLowerCase()}-${this.wedding.bride.toLowerCase()}-wedding-invitation.jpg`;
       await this.saveOrShareImage(
         dataUrl,
@@ -639,77 +639,40 @@ export class WeddingInvitation {
   }
 
   protected closeInvitePreview(): void {
-    const prev = this.invitePreviewUrl();
     this.invitePreviewUrl.set(null);
-    if (prev?.startsWith('blob:')) {
-      URL.revokeObjectURL(prev);
-    }
     this.unlockBackgroundScroll();
   }
 
   protected async shareInvitePreview(): Promise<void> {
-    const url = this.invitePreviewUrl();
-    if (!url) {
+    const dataUrl = this.invitePreviewUrl();
+    if (!dataUrl) {
       return;
     }
     const filename = this.invitePreviewFilename();
     const title = `${this.wedding.groom} & ${this.wedding.bride} Wedding Invitation`;
-    const file = await this.dataUrlToFile(url, filename);
-    const nav = navigator as Navigator & {
-      share?: (data: ShareData) => Promise<void>;
-      canShare?: (data: ShareData) => boolean;
-    };
-
-    // Fresh user gesture: try file share first (Save to Photos / Downloads on Android).
-    const fileShare: ShareData = { files: [file], title, text: title };
-    if (nav.share && (!nav.canShare || nav.canShare(fileShare))) {
-      try {
-        await nav.share(fileShare);
-        this.closeInvitePreview();
-        return;
-      } catch (err) {
-        if ((err as Error)?.name === 'AbortError') {
-          return;
-        }
-      }
-    }
-
-    // Some Android WebViews accept sharing a URL when files are blocked.
-    if (nav.share) {
-      try {
-        await nav.share({ title, text: title, url });
-        return;
-      } catch (err) {
-        if ((err as Error)?.name === 'AbortError') {
-          return;
-        }
-      }
-    }
-
-    // Last resort: trigger a tapped download / open.
-    this.downloadInvitePreview();
-  }
-
-  /** User-tapped download — works better on Android than long-press in Messenger. */
-  protected downloadInvitePreview(): void {
-    const url = this.invitePreviewUrl();
-    if (!url) {
+    const shared = await this.tryNativeImageShare(dataUrl, filename, title);
+    if (shared) {
+      this.closeInvitePreview();
       return;
     }
-    const filename = this.invitePreviewFilename();
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    link.target = '_blank';
-    link.rel = 'noopener';
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+    // Fresh tap: data-URL download is the most reliable Android Messenger fallback.
+    this.triggerDataUrlDownload(dataUrl, filename);
+  }
+
+  /** User-tapped download — data URLs work more often than blob: in Android Messenger. */
+  protected downloadInvitePreview(event?: Event): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    const dataUrl = this.invitePreviewUrl();
+    if (!dataUrl) {
+      return;
+    }
+    this.triggerDataUrlDownload(dataUrl, this.invitePreviewFilename());
   }
 
   /**
    * Save/share an image in a way that works on desktop, iOS, Android, and
-   * in-app browsers like Messenger (where `<a download>` is ignored).
+   * in-app browsers like Messenger (where `<a download>` is often ignored).
    */
   private async saveOrShareImage(
     dataUrl: string,
@@ -717,79 +680,86 @@ export class WeddingInvitation {
     title: string,
     fromPreview = false,
   ): Promise<void> {
-    const file = await this.dataUrlToFile(dataUrl, filename);
-    const nav = navigator as Navigator & {
-      share?: (data: ShareData) => Promise<void>;
-      canShare?: (data: ShareData) => boolean;
-    };
     const restricted = this.isRestrictedInAppBrowser();
+    const android = /Android/i.test(navigator.userAgent || '');
 
-    // 1) On mobile / in-app browsers: prefer native share with the image file
-    //    so the share sheet shows a real thumbnail (Save Image / Messenger / Photos).
-    const shareData: ShareData = {
-      files: [file],
-      title,
-      text: title,
-    };
-    const canShareFiles = !!nav.share && (!nav.canShare || nav.canShare(shareData));
-    if (canShareFiles && (restricted || this.isTouchShareDevice())) {
-      try {
-        await nav.share(shareData);
-        if (fromPreview) {
-          this.closeInvitePreview();
-        }
-        return;
-      } catch (err) {
-        if ((err as Error)?.name === 'AbortError') {
-          return;
-        }
-        // Fall through.
-      }
-    }
-
-    // 2) Direct download when the browser supports it (desktop / Android Chrome).
-    if (!restricted) {
-      // Prefer share-with-files on desktop too when available and download isn't needed.
-      if (canShareFiles && !fromPreview) {
-        try {
-          await nav.share!(shareData);
-          return;
-        } catch (err) {
-          if ((err as Error)?.name === 'AbortError') {
-            return;
-          }
-        }
-      }
-      const blobUrl = URL.createObjectURL(file);
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = filename;
-      link.rel = 'noopener';
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.setTimeout(() => URL.revokeObjectURL(blobUrl), 2_000);
+    // 1) Native share with the image file (best path on phones).
+    //    On Android Messenger, ignore canShare() — it often lies and blocks a working share.
+    const shared = await this.tryNativeImageShare(dataUrl, filename, title, {
+      skipCanShareCheck: android || restricted,
+    });
+    if (shared) {
       if (fromPreview) {
         this.closeInvitePreview();
       }
       return;
     }
 
-    // 3) Messenger / Instagram / etc.: blob preview + tap-to-save actions.
+    // 2) Direct download outside in-app browsers.
+    if (!restricted) {
+      this.triggerDataUrlDownload(dataUrl, filename);
+      if (fromPreview) {
+        this.closeInvitePreview();
+      }
+      return;
+    }
+
+    // 3) Android Messenger: try an immediate data-URL download while we still
+    //    have the original tap context, then show preview with tap actions.
+    if (android && !fromPreview) {
+      this.triggerDataUrlDownload(dataUrl, filename);
+    }
+
+    // 4) Preview UI — keep a data: URL (not blob:) so Download can work on tap.
     this.invitePreviewFilename.set(filename);
-    this.invitePreviewIsAndroid.set(/Android/i.test(navigator.userAgent || ''));
-    const previewUrl = URL.createObjectURL(file);
-    this.invitePreviewUrl.set(previewUrl);
+    this.invitePreviewIsAndroid.set(android);
+    this.invitePreviewUrl.set(dataUrl);
     if (!fromPreview) {
       this.lockBackgroundScroll();
     }
   }
 
-  private isTouchShareDevice(): boolean {
-    return (
-      (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0) ||
-      (typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)')?.matches === true)
-    );
+  private async tryNativeImageShare(
+    dataUrl: string,
+    filename: string,
+    title: string,
+    opts: { skipCanShareCheck?: boolean } = {},
+  ): Promise<boolean> {
+    const nav = navigator as Navigator & {
+      share?: (data: ShareData) => Promise<void>;
+      canShare?: (data: ShareData) => boolean;
+    };
+    if (!nav.share) {
+      return false;
+    }
+
+    try {
+      const file = await this.dataUrlToFile(dataUrl, filename);
+      const fileShare: ShareData = { files: [file], title, text: title };
+      if (!opts.skipCanShareCheck && nav.canShare && !nav.canShare(fileShare)) {
+        return false;
+      }
+      await nav.share(fileShare);
+      return true;
+    } catch (err) {
+      if ((err as Error)?.name === 'AbortError') {
+        return true; // user cancelled — treat as handled
+      }
+    }
+
+    return false;
+  }
+
+  private triggerDataUrlDownload(dataUrl: string, filename: string): void {
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = filename;
+    link.rel = 'noopener';
+    // Some Android WebViews need the node in the DOM + a real click.
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
   }
 
   private isRestrictedInAppBrowser(): boolean {

@@ -435,7 +435,9 @@
       <h3 class="invite-preview__title" id="invite-preview-title">Save Invitation</h3>
       <p class="invite-preview__hint">
         @if (invitePreviewIsAndroid()) {
-          On Android Messenger, long-press usually does not work. Tap <strong>Share / Save</strong> below, then choose Photos or Downloads.
+          On Android Messenger, tap <strong>Share / Save</strong> then choose
+          <strong>Photos</strong>, <strong>Drive</strong>, or <strong>Downloads</strong>.
+          Long-press usually does not work here.
         } @else {
           Press and hold the image to Save Image, or tap Share / Save below.
         }
@@ -451,9 +453,8 @@
           class="btn invite-preview__download"
           [href]="preview"
           [attr.download]="invitePreviewFilename()"
-          target="_blank"
           rel="noopener"
-          (click)="$event.stopPropagation()">
+          (click)="downloadInvitePreview($event)">
           Download Image
         </a>
       </div>

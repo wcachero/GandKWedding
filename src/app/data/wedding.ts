@@ -137,7 +137,7 @@ export const WEDDING: Wedding = {
     maidOfHonor: 'Ms. Cholyn Axel Cabello',
     secondarySponsors: [
       { role: 'Candle', pair: 'Mr. Laj Christian Bautista & Ms. Kristine Naling' },
-      { role: 'Cord', pair: 'Mr. Yajnyl Bautista & Girlie Dueñas-Cachero' },
+      { role: 'Cord', pair: 'Mr. Yajnyl Bautista & Ms. Girlie Dueñas' },
       { role: 'Veil', pair: 'Mr. Regi Rajine Bautista & Ms. Jezzelle Seredilla' },
     ],
     bearers: [
