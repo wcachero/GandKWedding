@@ -303,6 +303,11 @@ export class WeddingInvitation {
     this.menuOpen.set(false);
   }
 
+  protected downloadFromMenu(): void {
+    this.closeMenu();
+    void this.downloadInvitationImage();
+  }
+
   /** Public URL of this invitation, resolved in the browser. */
   protected readonly shareUrl = signal('');
 

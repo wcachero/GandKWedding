@@ -19,6 +19,15 @@
     <li><a href="#entourage" (click)="closeMenu()">Entourage</a></li>
     <li><a href="#gallery" (click)="closeMenu()">Gallery</a></li>
     <li><a href="#rsvp" (click)="closeMenu()">RSVP</a></li>
+    <li>
+      <button
+        type="button"
+        class="nav__download"
+        (click)="downloadFromMenu()"
+        [disabled]="inviteDownloading()">
+        {{ inviteDownloading() ? 'Preparing…' : 'Download Invitation' }}
+      </button>
+    </li>
   </ul>
 </nav>
 

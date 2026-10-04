@@ -231,6 +231,31 @@
     }
   }
 
+  &__download {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    padding: 0 0 5px;
+    font: inherit;
+    text-transform: inherit;
+    letter-spacing: inherit;
+    color: #6e5224;
+    cursor: pointer;
+    text-shadow:
+      0 0 4px rgba(255, 248, 230, 0.55),
+      0 0 12px rgba(110, 82, 36, 0.5);
+
+    &:hover,
+    &:focus-visible {
+      color: #4f3a18;
+    }
+
+    &:disabled {
+      opacity: 0.65;
+      cursor: wait;
+    }
+  }
+
   /* ----- Mobile: collapse links behind a hamburger ----- */
   @media (max-width: 680px) {
     background: linear-gradient(
