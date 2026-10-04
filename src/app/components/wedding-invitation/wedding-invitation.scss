@@ -1228,12 +1228,41 @@
   background:
     radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255, 248, 239, 0.9), transparent 65%),
     linear-gradient(180deg, #f7ebe3 0%, #f3e0d4 45%, #ecd4c4 100%);
-  overflow-x: hidden;
-  overflow-y: visible;
+  overflow: hidden;
   max-width: 100%;
   padding-bottom: clamp(1rem, 3vw, 2rem);
 
+  /* Floral wash behind the card — names stay above it. */
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    pointer-events: none;
+    background-repeat: no-repeat;
+    background-size: contain;
+    opacity: 0.72;
+  }
+
+  &::before {
+    top: -0.5rem;
+    right: -1.25rem;
+    width: clamp(10rem, 34vw, 20rem);
+    aspect-ratio: 613 / 689;
+    background-image: url("/images/entourage-floral-tr.png");
+  }
+
+  &::after {
+    bottom: -1.25rem;
+    left: -1rem;
+    width: clamp(9.5rem, 32vw, 18rem);
+    aspect-ratio: 586 / 680;
+    background-image: url("/images/entourage-floral-bl.png");
+  }
+
   .container {
+    position: relative;
+    z-index: 1;
     padding-inline: clamp(0.4rem, 2.5vw, 1.25rem);
     max-width: min(920px, 100%);
     width: 100%;
@@ -1255,7 +1284,7 @@
     position: relative;
     z-index: 1;
     overflow: hidden;
-    padding: clamp(1.35rem, 3.5vw, 2.25rem) clamp(0.4rem, 2vw, 1.5rem);
+    padding: clamp(1.5rem, 3.5vw, 2.4rem) clamp(0.65rem, 2.5vw, 1.75rem);
     background:
       linear-gradient(#fbf6f1, #fbf6f1) padding-box,
       linear-gradient(135deg, rgba(195, 164, 107, 0.95), rgba(227, 163, 121, 0.75), rgba(195, 164, 107, 0.95)) border-box;
@@ -1264,19 +1293,27 @@
       inset 0 0 0 3px #fbf6f1,
       inset 0 0 0 4.5px rgba(195, 164, 107, 0.7),
       0 14px 32px rgba(94, 70, 53, 0.1);
+
+    > * + * {
+      margin-top: 0.35rem;
+    }
   }
 
   &__cols {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: clamp(1.35rem, 3vw, 1.85rem);
-    margin-bottom: clamp(1.75rem, 4vw, 2.5rem);
-    padding-bottom: clamp(0.35rem, 1vw, 0.6rem);
+    gap: 0;
+    margin: 0;
+    padding: 0;
     align-items: start;
 
     .entourage__block {
-      margin-bottom: 0;
-      padding-bottom: 0;
+      margin: 0;
+      padding: 0 0 1.55rem;
+    }
+
+    .entourage__block + .entourage__block {
+      margin-top: 0.35rem;
     }
 
     .entourage__name {
@@ -1286,48 +1323,47 @@
 
   &__block {
     min-width: 0;
-    margin-bottom: clamp(1.75rem, 4vw, 2.5rem);
-    padding-bottom: clamp(0.35rem, 1vw, 0.6rem);
+    margin: 0;
+    padding: 0 0 1.55rem;
 
-    &:last-child {
+    &--flower-girls .entourage__name:last-child {
       margin-bottom: 0;
-      padding-bottom: 0;
-    }
-
-    &--flower-girls {
-      .entourage__name { margin-bottom: clamp(0.85rem, 2.5vw, 1.5rem); }
-    }
-
-    &--pair .entourage__flourish {
-      width: min(22rem, 70%);
-      margin-bottom: 0.65rem;
     }
   }
 
   &__role {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.7rem;
     font-family: var(--font-script);
     text-transform: none;
     letter-spacing: 0.01em;
-    font-size: clamp(1.65rem, 1.25rem + 1.5vw, 2.25rem);
+    font-size: clamp(1.28rem, 1.05rem + 0.8vw, 1.65rem);
     font-weight: 400;
     color: #6e5224;
-    margin: 0 0 0.15rem;
+    margin: 0.15rem 0 0.05rem;
+    padding-top: 0.1rem;
+    padding-bottom: 0;
     line-height: 1.15;
-  }
 
-  &__flourish {
-    display: block;
-    width: min(32rem, 78%);
-    height: auto;
-    margin: 0 auto 0.85rem;
-    opacity: 0.85;
+    &::before,
+    &::after {
+      content: "";
+      flex: 0 0 auto;
+      width: 1.35rem;
+      max-width: 1.35rem;
+      height: 1.5px;
+      border-radius: 1px;
+      background: #a67c52;
+    }
   }
 
   &__names {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     column-gap: clamp(0.25rem, 1.5vw, 1.25rem);
-    row-gap: 0.3rem;
+    row-gap: 0.55rem;
     width: 100%;
     margin-inline: auto;
     align-items: start;
@@ -1344,8 +1380,21 @@
     }
 
     &--pair-roles {
-      margin-bottom: 0.15rem;
-      .entourage__role { margin-bottom: 0; }
+      margin-bottom: 0.05rem;
+      column-gap: 0.65rem;
+
+      .entourage__role {
+        margin-bottom: 0.05rem;
+        gap: 0.35rem;
+        font-size: clamp(1.05rem, 3.1vw, 1.4rem);
+
+        &::before,
+        &::after {
+          flex: 0 0 auto;
+          width: 0.85rem;
+          max-width: 0.85rem;
+        }
+      }
     }
   }
 
@@ -1379,8 +1428,6 @@
 
   @media (max-width: 680px) {
     padding-block: clamp(2.5rem, 8vw, 4rem);
-
-    &__flourish { width: min(20rem, 86%); margin-bottom: 0.55rem; }
 
     &__names--bearers .entourage__subrole {
       font-size: clamp(1.05rem, 4.2vw, 1.35rem);

@@ -246,8 +246,6 @@
     </div>
   </section>
 
-  <div class="divider" aria-hidden="true"><img src="images/flourish.svg" alt="" appReveal /></div>
-
   <!-- Entourage -->
   <section class="section entourage" id="entourage">
     <div class="container">
@@ -259,14 +257,12 @@
           <div class="entourage__cols">
             <div class="entourage__block">
               <p class="entourage__role">Parents of the Groom</p>
-              <img class="entourage__flourish" src="images/flourish.svg" alt="" aria-hidden="true" />
               @for (name of wedding.entourage.parentsOfGroom; track name) {
                 <p class="entourage__name">{{ name }}</p>
               }
             </div>
             <div class="entourage__block">
               <p class="entourage__role">Parents of the Bride</p>
-              <img class="entourage__flourish" src="images/flourish.svg" alt="" aria-hidden="true" />
               @for (name of wedding.entourage.parentsOfBride; track name) {
                 <p class="entourage__name">{{ name }}</p>
               }
@@ -275,7 +271,6 @@
 
           <div class="entourage__block entourage__block--full">
             <p class="entourage__role">Principal Sponsors</p>
-            <img class="entourage__flourish" src="images/flourish.svg" alt="" aria-hidden="true" />
             <div class="entourage__names">
               @for (pair of wedding.entourage.principalSponsors; track pair.gentlemen) {
                 <p class="entourage__name">{{ pair.gentlemen }}</p>
@@ -289,7 +284,6 @@
               <p class="entourage__role">Best Man</p>
               <p class="entourage__role">Maid of Honor</p>
             </div>
-            <img class="entourage__flourish" src="images/flourish.svg" alt="" aria-hidden="true" />
             <div class="entourage__names">
               <p class="entourage__name">{{ wedding.entourage.bestMan }}</p>
               <p class="entourage__name">{{ wedding.entourage.maidOfHonor }}</p>
@@ -297,9 +291,8 @@
           </div>
 
           @for (s of wedding.entourage.secondarySponsors; track s.role) {
-            <div class="entourage__block entourage__block--full">
+            <div class="entourage__block entourage__block--full entourage__block--secondary">
               <p class="entourage__role">{{ s.role }}</p>
-              <img class="entourage__flourish" src="images/flourish.svg" alt="" aria-hidden="true" />
               <div class="entourage__names">
                 @for (name of s.pair.split(' & '); track name) {
                   <p class="entourage__name">{{ name }}</p>
@@ -310,7 +303,6 @@
 
           <div class="entourage__block entourage__block--full">
             <p class="entourage__role">Bearers</p>
-            <img class="entourage__flourish" src="images/flourish.svg" alt="" aria-hidden="true" />
             <div class="entourage__names entourage__names--bearers">
               @for (b of wedding.entourage.bearers; track b.role) {
                 <div class="entourage__bearer">
@@ -324,7 +316,6 @@
           @if (wedding.entourage.flowerGirls.length) {
             <div class="entourage__block entourage__block--full entourage__block--flower-girls">
               <p class="entourage__role">Flower Girl</p>
-              <img class="entourage__flourish" src="images/flourish.svg" alt="" aria-hidden="true" />
               <div class="entourage__names">
                 @for (name of wedding.entourage.flowerGirls; track name) {
                   <p class="entourage__name">{{ name }}</p>
@@ -336,8 +327,6 @@
       </div>
     </div>
   </section>
-
-  <div class="divider" aria-hidden="true"><img src="images/flourish.svg" alt="" appReveal /></div>
 
   <!-- RSVP -->
   <section class="section rsvp" id="rsvp">
