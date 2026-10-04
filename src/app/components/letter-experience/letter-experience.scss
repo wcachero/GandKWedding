@@ -414,7 +414,7 @@
 
 /* When the invitation is open, lift the disc above the bottom tab bar. */
 .scene[data-stage='reading'] .scene__music {
-  bottom: calc(var(--tabbar-h) + var(--space-4));
+  bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px) + 0.85rem);
 }
 
 /* ----- Bottom tab bar (Home / RSVP / Gallery) ----------------------------- */

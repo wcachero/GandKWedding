@@ -86,7 +86,7 @@ export const WEDDING: Wedding = {
   reception: {
     title: 'Sherinal Events Place — Grand Pavilion',
     kicker: 'The Reception',
-    time: "We'll gather for a lovely lunch in a comfortable indoor setting",
+    time: 'Lunch to follow',
     venue: 'Sherinal Events Place — Grand Pavilion',
     address: 'Presentacion St., Zavalla 3 Subdivision, Brgy. Tagapo, Santa Rosa, Laguna',
     mapQuery: 'Sherinal Events Place, Zavalla 3 Subdivision, Brgy. Tagapo, Santa Rosa, Laguna',
@@ -102,7 +102,7 @@ export const WEDDING: Wedding = {
       { name: 'Muted Gold', color: 'var(--swatch-muted-gold)' },
       { name: 'Champagne', color: 'var(--swatch-champagne)' },
     ],
-    note: 'Semi-formal attire in Warm Peach, Soft Blush, Muted Gold, and Champagne colors are welcome.',
+    note: 'Semi-formal, in these shades.',
   },
   rsvp: {
     url: 'https://script.google.com/macros/s/AKfycbzJQmmnqci0N9stgHUoOX-v8p6mzRAyy82rrWXM1H-_45GBf2OdveebLXvxQTR9WKeJ/exec',
@@ -153,7 +153,7 @@ export const WEDDING: Wedding = {
   socials: [
     { label: 'Facebook', url: 'https://facebook.com/wcachero', icon: 'facebook' },
     { label: 'Instagram', url: '#', icon: 'instagram' },   // add real link when available
-    { label: 'TikTok', url: '#', icon: 'tiktok' },         // add real link when available
+    { label: 'TikTok', url: 'https://www.tiktok.com/@gw.moments', icon: 'tiktok' },
     { label: 'Email', url: 'mailto:hello@example.com', icon: 'email' },
   ],
 };
