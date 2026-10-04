@@ -403,6 +403,18 @@
           <span class="share__card-hint">{{ shareHint() }}</span>
         </button>
       </div>
+
+      <div class="share__download" appReveal>
+        <p class="share__download-label">Download Invitation</p>
+        <p class="share__download-hint">Save a keepsake card to share offline</p>
+        <button
+          type="button"
+          class="btn share__download-btn"
+          (click)="downloadInvitationImage()"
+          [disabled]="inviteDownloading()">
+          {{ inviteDownloading() ? 'Preparing…' : 'Download Image' }}
+        </button>
+      </div>
     </div>
   </section>
 

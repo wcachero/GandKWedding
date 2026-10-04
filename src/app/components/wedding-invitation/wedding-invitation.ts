@@ -456,9 +456,11 @@ export class WeddingInvitation {
   /** Bottom-of-page RSVP deadline warning — shown once per visit. */
   protected readonly rsvpDeadlineOpen = signal(false);
   private static readonly RSVP_NOTICE_KEY = 'gk-rsvp-deadline-seen';
+  private rsvpNoticeScrollY = 0;
 
   protected dismissRsvpDeadline(): void {
     this.rsvpDeadlineOpen.set(false);
+    this.unlockBackgroundScroll();
     try {
       sessionStorage.setItem(WeddingInvitation.RSVP_NOTICE_KEY, '1');
     } catch {
@@ -492,13 +494,44 @@ export class WeddingInvitation {
           return;
         }
         this.rsvpDeadlineOpen.set(true);
+        this.lockBackgroundScroll();
         observer.disconnect();
       },
       { root: null, threshold: 0.35 },
     );
 
     observer.observe(end);
-    this.destroyRef.onDestroy(() => observer.disconnect());
+    this.destroyRef.onDestroy(() => {
+      observer.disconnect();
+      if (this.rsvpDeadlineOpen()) {
+        this.unlockBackgroundScroll();
+      }
+    });
+  }
+
+  /** Freeze page scroll while the RSVP notice overlay is open (incl. iOS). */
+  private lockBackgroundScroll(): void {
+    this.rsvpNoticeScrollY = window.scrollY;
+    const body = document.body;
+    body.style.position = 'fixed';
+    body.style.top = `-${this.rsvpNoticeScrollY}px`;
+    body.style.left = '0';
+    body.style.right = '0';
+    body.style.width = '100%';
+    body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+  }
+
+  private unlockBackgroundScroll(): void {
+    const body = document.body;
+    body.style.position = '';
+    body.style.top = '';
+    body.style.left = '';
+    body.style.right = '';
+    body.style.width = '';
+    body.style.overflow = '';
+    document.documentElement.style.overflow = '';
+    window.scrollTo(0, this.rsvpNoticeScrollY);
   }
 
   /** QR with nav logo composited in the centre (high error correction). */
@@ -571,6 +604,432 @@ export class WeddingInvitation {
 
   /** True while the themed QR card PNG is being composed for download. */
   protected readonly qrDownloading = signal(false);
+
+  /** True while the invitation keepake image is being composed. */
+  protected readonly inviteDownloading = signal(false);
+
+  protected async downloadInvitationImage(): Promise<void> {
+    if (this.inviteDownloading()) {
+      return;
+    }
+    this.inviteDownloading.set(true);
+    try {
+      const dataUrl = await this.buildInvitationKeepsake();
+      this.triggerDownload(
+        dataUrl,
+        `${this.wedding.groom.toLowerCase()}-${this.wedding.bride.toLowerCase()}-wedding-invitation.png`,
+      );
+    } catch {
+      /* keep the page usable if canvas/fonts fail */
+    } finally {
+      this.inviteDownloading.set(false);
+    }
+  }
+
+  private triggerDownload(dataUrl: string, filename: string): void {
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = filename;
+    link.rel = 'noopener';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  }
+
+  /** Classic wedding invitation artwork including details + entourage (PNG data URL). */
+  private async buildInvitationKeepsake(): Promise<string> {
+    if (document.fonts?.ready) {
+      await document.fonts.ready;
+    }
+
+    const width = 1080;
+    const height = 3200;
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      throw new Error('Canvas unavailable');
+    }
+
+    const bg = ctx.createLinearGradient(0, 0, 0, height);
+    bg.addColorStop(0, '#f7ebe3');
+    bg.addColorStop(0.35, '#fbf6f1');
+    bg.addColorStop(1, '#ecd4c4');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, width, height);
+
+    const glow = ctx.createRadialGradient(width / 2, 380, 20, width / 2, 520, width * 0.55);
+    glow.addColorStop(0, 'rgba(227, 163, 121, 0.26)');
+    glow.addColorStop(1, 'rgba(227, 163, 121, 0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, width, height);
+
+    const inset = 40;
+    ctx.strokeStyle = 'rgba(195, 164, 107, 0.95)';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(inset, inset, width - inset * 2, height - inset * 2);
+    ctx.strokeStyle = 'rgba(195, 164, 107, 0.55)';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(inset + 14, inset + 14, width - (inset + 14) * 2, height - (inset + 14) * 2);
+
+    // Full corner florals (drawn large so sprays are not clipped)
+    try {
+      const [floralTr, floralBl] = await Promise.all([
+        this.loadImage('images/entourage-floral-tr.png'),
+        this.loadImage('images/entourage-floral-bl.png'),
+      ]);
+      const floralW = 280;
+      ctx.drawImage(
+        floralTr,
+        width - floralW - 8,
+        8,
+        floralW,
+        floralW * (floralTr.height / floralTr.width),
+      );
+      const blH = floralW * (floralBl.height / floralBl.width);
+      ctx.drawImage(floralBl, 8, height - blH - 8, floralW, blH);
+    } catch {
+      /* florals unavailable */
+    }
+
+    ctx.textAlign = 'center';
+    let y = 150;
+
+    ctx.fillStyle = '#a67c52';
+    ctx.font = '600 20px Cinzel, serif';
+    this.fillSpacedText(ctx, 'TOGETHER WITH THEIR FAMILIES', width / 2, y, 5);
+    // Bottom padding under the kicker before the names
+    y += 110;
+
+    ctx.fillStyle = '#6e5224';
+    ctx.font = '400 82px "Great Vibes", cursive';
+    ctx.fillText(this.wedding.groom, width / 2, y);
+    y += 50;
+    ctx.font = '400 46px "Great Vibes", cursive';
+    ctx.fillStyle = '#c3a46b';
+    ctx.fillText('&', width / 2, y);
+    y += 56;
+    ctx.fillStyle = '#6e5224';
+    ctx.font = '400 82px "Great Vibes", cursive';
+    ctx.fillText(this.wedding.bride, width / 2, y);
+    y += 36;
+
+    this.drawGoldRule(ctx, width / 2, y, 220);
+    y += 42;
+
+    ctx.fillStyle = '#5e4635';
+    ctx.font = 'italic 500 26px "Cormorant Garamond", serif';
+    ctx.fillText('joyfully invite you to celebrate their wedding', width / 2, y);
+    y += 48;
+
+    const { weekday, monthShort, day, year } = this.wedding.dateLong;
+    ctx.fillStyle = '#a67c52';
+    ctx.font = '600 20px Cinzel, serif';
+    this.fillSpacedText(ctx, weekday.toUpperCase(), width / 2, y, 6);
+    y += 42;
+
+    ctx.fillStyle = '#3f2a1c';
+    ctx.font = '600 48px "Cormorant Garamond", serif';
+    ctx.fillText(`${day} ${monthShort} ${year}`, width / 2, y);
+    y += 40;
+
+    ctx.fillStyle = '#6e5c4e';
+    ctx.font = 'italic 500 28px "Cormorant Garamond", serif';
+    ctx.fillText(this.wedding.ceremony.time, width / 2, y);
+    y += 44;
+
+    this.drawGoldRule(ctx, width / 2, y, 150);
+    y += 40;
+
+    ctx.fillStyle = '#a67c52';
+    ctx.font = '600 18px Cinzel, serif';
+    this.fillSpacedText(ctx, 'CEREMONY', width / 2, y, 5);
+    y += 30;
+    ctx.fillStyle = '#3f2a1c';
+    ctx.font = '600 28px "Cormorant Garamond", serif';
+    y = this.fillWrappedText(ctx, this.wedding.ceremony.venue, width / 2, y, width - 200, 32);
+    y += 2;
+    ctx.fillStyle = '#6e5c4e';
+    ctx.font = '400 22px "Cormorant Garamond", serif';
+    y = this.fillWrappedText(ctx, this.wedding.ceremony.address, width / 2, y, width - 220, 28);
+    y += 28;
+
+    ctx.fillStyle = '#a67c52';
+    ctx.font = '600 18px Cinzel, serif';
+    this.fillSpacedText(ctx, 'RECEPTION', width / 2, y, 5);
+    y += 30;
+    ctx.fillStyle = '#3f2a1c';
+    ctx.font = '600 26px "Cormorant Garamond", serif';
+    y = this.fillWrappedText(ctx, this.wedding.reception.venue, width / 2, y, width - 200, 30);
+    y += 2;
+    ctx.fillStyle = '#6e5c4e';
+    ctx.font = '400 22px "Cormorant Garamond", serif';
+    y = this.fillWrappedText(ctx, this.wedding.reception.address, width / 2, y, width - 220, 28);
+    y += 6;
+    ctx.font = 'italic 400 20px "Cormorant Garamond", serif';
+    y = this.fillWrappedText(ctx, this.wedding.reception.time, width / 2, y, width - 220, 26);
+    y += 28;
+
+    this.drawGoldRule(ctx, width / 2, y, 130);
+    y += 36;
+
+    ctx.fillStyle = '#a67c52';
+    ctx.font = '600 18px Cinzel, serif';
+    this.fillSpacedText(ctx, 'ATTIRE', width / 2, y, 5);
+    y += 30;
+    ctx.fillStyle = '#3f2a1c';
+    ctx.font = '500 26px "Cormorant Garamond", serif';
+    ctx.fillText(this.wedding.dressCode.title, width / 2, y);
+    y += 36;
+    y = this.drawAttirePalette(ctx, width / 2, y, this.wedding.dressCode.swatches);
+    y += 28;
+
+    ctx.fillStyle = '#a67c52';
+    ctx.font = '600 18px Cinzel, serif';
+    ctx.fillText(`RSVP by ${this.wedding.rsvp.deadline}`, width / 2, y);
+    y += 36;
+
+    this.drawGoldRule(ctx, width / 2, y, 180);
+    y += 44;
+
+    // Entourage
+    ctx.fillStyle = '#a67c52';
+    ctx.font = '600 20px Cinzel, serif';
+    this.fillSpacedText(ctx, 'THE ENTOURAGE', width / 2, y, 6);
+    y += 40;
+    y = this.drawInviteEntourage(ctx, width, y);
+    y += 28;
+
+    const qr = this.qrDataUrl();
+    if (qr) {
+      try {
+        const qrImg = await this.loadImage(qr);
+        const qrSize = 120;
+        const qrX = (width - qrSize) / 2;
+        const qrY = Math.min(y + 4, height - qrSize - 90);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16);
+        ctx.strokeStyle = 'rgba(195, 164, 107, 0.55)';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16);
+        ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+        y = qrY + qrSize + 28;
+      } catch {
+        y += 12;
+      }
+    }
+
+    ctx.fillStyle = '#a67c52';
+    ctx.font = '600 20px Cinzel, serif';
+    ctx.fillText(this.wedding.monogram, width / 2, Math.min(y + 2, height - 70));
+
+    // Crop unused bottom canvas so the download is not overly tall
+    const usedH = Math.min(height, Math.ceil(Math.max(y + 60, 1800)));
+    if (usedH < height) {
+      const cropped = document.createElement('canvas');
+      cropped.width = width;
+      cropped.height = usedH;
+      const cctx = cropped.getContext('2d');
+      if (cctx) {
+        cctx.drawImage(canvas, 0, 0, width, usedH, 0, 0, width, usedH);
+        // redraw bottom floral on cropped canvas edge
+        try {
+          const floralBl = await this.loadImage('images/entourage-floral-bl.png');
+          const floralW = 280;
+          const blH = floralW * (floralBl.height / floralBl.width);
+          cctx.drawImage(floralBl, 8, usedH - blH - 8, floralW, blH);
+          // restore gold frame bottom edge over floral slightly
+          cctx.strokeStyle = 'rgba(195, 164, 107, 0.95)';
+          cctx.lineWidth = 3;
+          cctx.strokeRect(inset, inset, width - inset * 2, usedH - inset * 2);
+        } catch {
+          /* ignore */
+        }
+        return cropped.toDataURL('image/png');
+      }
+    }
+
+    return canvas.toDataURL('image/png');
+  }
+
+  /** Compact entourage block for the downloadable invitation image. */
+  private drawInviteEntourage(ctx: CanvasRenderingContext2D, width: number, startY: number): number {
+    const e = this.wedding.entourage;
+    let y = startY;
+    const colGap = 40;
+    const colW = (width - 220 - colGap) / 2;
+    const leftX = 110 + colW / 2;
+    const rightX = width - 110 - colW / 2;
+
+    const role = (label: string, x: number, yy: number): number => {
+      ctx.fillStyle = '#a67c52';
+      ctx.font = '600 15px Cinzel, serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(label.toUpperCase(), x, yy);
+      return yy + 22;
+    };
+    const name = (text: string, x: number, yy: number): number => {
+      ctx.fillStyle = '#3f2a1c';
+      ctx.font = '500 20px "Cormorant Garamond", serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(text, x, yy);
+      return yy + 24;
+    };
+
+    // Parents — two columns
+    let yL = role('Parents of the Groom', leftX, y);
+    for (const n of e.parentsOfGroom) {
+      yL = name(n, leftX, yL);
+    }
+    let yR = role('Parents of the Bride', rightX, y);
+    for (const n of e.parentsOfBride) {
+      yR = name(n, rightX, yR);
+    }
+    y = Math.max(yL, yR) + 18;
+
+    // Best man / Maid of honor
+    yL = role('Best Man', leftX, y);
+    yL = name(e.bestMan, leftX, yL);
+    yR = role('Maid of Honor', rightX, y);
+    yR = name(e.maidOfHonor, rightX, yR);
+    y = Math.max(yL, yR) + 20;
+
+    // Principal sponsors
+    ctx.fillStyle = '#a67c52';
+    ctx.font = '600 15px Cinzel, serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('PRINCIPAL SPONSORS', width / 2, y);
+    y += 26;
+    for (const pair of e.principalSponsors) {
+      ctx.fillStyle = '#3f2a1c';
+      ctx.font = '500 19px "Cormorant Garamond", serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(pair.gentlemen, leftX, y);
+      ctx.fillText(pair.ladies, rightX, y);
+      y += 24;
+    }
+    y += 14;
+
+    // Secondary sponsors
+    const secondaryCols = e.secondarySponsors;
+    const secW = (width - 200) / Math.max(secondaryCols.length, 1);
+    let secBottom = y;
+    secondaryCols.forEach((s, i) => {
+      const x = 100 + secW * i + secW / 2;
+      let yy = role(s.role, x, y);
+      for (const n of s.pair.split(' & ')) {
+        yy = name(n, x, yy);
+      }
+      secBottom = Math.max(secBottom, yy);
+    });
+    y = secBottom + 18;
+
+    // Bearers
+    const bearerW = (width - 200) / Math.max(e.bearers.length, 1);
+    let bearerBottom = y;
+    e.bearers.forEach((b, i) => {
+      const x = 100 + bearerW * i + bearerW / 2;
+      let yy = role(b.role, x, y);
+      yy = name(b.name, x, yy);
+      bearerBottom = Math.max(bearerBottom, yy);
+    });
+    y = bearerBottom + 16;
+
+    // Flower girls
+    if (e.flowerGirls.length) {
+      ctx.fillStyle = '#a67c52';
+      ctx.font = '600 15px Cinzel, serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('FLOWER GIRL', width / 2, y);
+      y += 24;
+      const fgW = (width - 260) / Math.max(e.flowerGirls.length, 1);
+      e.flowerGirls.forEach((n, i) => {
+        const x = 130 + fgW * i + fgW / 2;
+        name(n, x, y);
+      });
+      y += 28;
+    }
+
+    ctx.textAlign = 'center';
+    return y;
+  }
+
+  /** Resolve dress swatch CSS variables to hex for canvas drawing. */
+  private resolveSwatchColor(color: string): string {
+    const map: Record<string, string> = {
+      'var(--swatch-warm-peach)': '#e3a379',
+      'var(--swatch-soft-blush)': '#efd0c6',
+      'var(--swatch-muted-gold)': '#c3a46b',
+      'var(--swatch-champagne)': '#e7d8bc',
+    };
+    return map[color] ?? color;
+  }
+
+  private drawAttirePalette(
+    ctx: CanvasRenderingContext2D,
+    cx: number,
+    y: number,
+    swatches: readonly { readonly name: string; readonly color: string }[],
+  ): number {
+    const count = swatches.length;
+    if (!count) {
+      return y;
+    }
+
+    const circleR = 22;
+    const gap = 118;
+    const totalW = (count - 1) * gap;
+    const startX = cx - totalW / 2;
+    const prevAlign = ctx.textAlign;
+
+    swatches.forEach((swatch, i) => {
+      const x = startX + i * gap;
+      ctx.beginPath();
+      ctx.arc(x, y, circleR, 0, Math.PI * 2);
+      ctx.fillStyle = this.resolveSwatchColor(swatch.color);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(110, 82, 36, 0.35)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.fillStyle = '#6e5c4e';
+      ctx.font = '500 16px Cinzel, serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(swatch.name, x, y + circleR + 22);
+    });
+
+    ctx.textAlign = prevAlign;
+    return y + circleR + 34;
+  }
+
+  private fillWrappedText(
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    x: number,
+    y: number,
+    maxWidth: number,
+    lineHeight: number,
+  ): number {
+    const words = text.split(/\s+/);
+    let line = '';
+    let cursorY = y;
+    for (const word of words) {
+      const next = line ? `${line} ${word}` : word;
+      if (ctx.measureText(next).width > maxWidth && line) {
+        ctx.fillText(line, x, cursorY);
+        cursorY += lineHeight;
+        line = word;
+      } else {
+        line = next;
+      }
+    }
+    if (line) {
+      ctx.fillText(line, x, cursorY);
+      cursorY += lineHeight;
+    }
+    return cursorY;
+  }
 
   /** Build a themed invitation card (header + QR) and download it as PNG. */
   protected async downloadQr(): Promise<void> {

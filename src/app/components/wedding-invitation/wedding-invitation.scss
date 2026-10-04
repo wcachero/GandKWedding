@@ -1314,39 +1314,40 @@
   background:
     radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255, 248, 239, 0.9), transparent 65%),
     linear-gradient(180deg, #f7ebe3 0%, #f3e0d4 45%, #ecd4c4 100%);
-  overflow: hidden;
+  overflow: visible;
 
   &__card {
     position: relative;
     z-index: 1;
     max-width: 760px;
     margin: 0 auto;
-    padding: 0;
+    padding: clamp(0.85rem, 2.5vw, 1.35rem);
+    overflow: visible;
   }
 
   &__floral {
     position: absolute;
     z-index: 3;
-    /* Flower-only crops are taller (trailing sprigs); keep width modest */
-    width: clamp(4.75rem, 16vw, 7rem);
+    width: clamp(7.5rem, 26vw, 11rem);
     height: auto;
     pointer-events: none;
     user-select: none;
 
     &--tr {
-      top: -0.2rem;
-      right: -0.2rem;
+      top: -0.65rem;
+      right: -0.65rem;
     }
 
     &--bl {
-      bottom: -0.2rem;
-      left: -0.2rem;
+      bottom: -0.65rem;
+      left: -0.65rem;
     }
   }
 
   &__frame {
     position: relative;
     z-index: 1;
+    overflow: visible;
     padding: clamp(2.75rem, 7vw, 3.75rem) clamp(1.35rem, 4.5vw, 2.75rem);
     background:
       linear-gradient(#fbf6f1, #fbf6f1) padding-box,
@@ -1422,7 +1423,7 @@
 
   @media (max-width: 680px) {
     &__floral {
-      width: clamp(3.75rem, 22vw, 5.25rem);
+      width: clamp(5.5rem, 30vw, 7.5rem);
     }
 
     &__cols {
@@ -1698,6 +1699,45 @@
     letter-spacing: 0.18em;
     font-size: 0.64rem;
     color: var(--color-text-muted);
+  }
+
+  &__download {
+    max-width: 620px;
+    margin: clamp(1.75rem, 4vw, 2.5rem) auto 0;
+    padding: clamp(1.35rem, 3.5vw, 1.85rem) clamp(1rem, 3vw, 1.5rem);
+    text-align: center;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(227, 163, 121, 0.16), transparent 70%),
+      var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  &__download-label {
+    font-family: var(--font-heading);
+    font-size: clamp(1.2rem, 1rem + 0.7vw, 1.5rem);
+    color: var(--color-maroon);
+    margin: 0 0 0.35rem;
+  }
+
+  &__download-hint {
+    font-family: var(--font-ui);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.64rem;
+    color: var(--color-text-muted);
+    margin: 0 0 var(--space-5);
+  }
+
+  &__download-btn {
+    width: min(100%, 280px);
+
+    &:disabled {
+      opacity: 0.65;
+      cursor: wait;
+      transform: none;
+    }
   }
 }
 
