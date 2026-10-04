@@ -270,7 +270,7 @@
           <div class="entourage__block entourage__block--full">
             <p class="entourage__role">Principal Sponsors</p>
             <img class="entourage__flourish" src="images/flourish.svg" alt="" aria-hidden="true" />
-            <div class="entourage__sponsors">
+            <div class="entourage__names">
               @for (pair of wedding.entourage.principalSponsors; track pair.gentlemen) {
                 <p class="entourage__name">{{ pair.gentlemen }}</p>
                 <p class="entourage__name">{{ pair.ladies }}</p>
@@ -291,33 +291,36 @@
             </div>
           </div>
 
-          <div class="entourage__cols entourage__cols--secondary">
-            @for (s of wedding.entourage.secondarySponsors; track s.role) {
-              <div class="entourage__block">
-                <p class="entourage__role">{{ s.role }}</p>
-                <img class="entourage__flourish" src="images/flourish.svg" alt="" aria-hidden="true" />
+          @for (s of wedding.entourage.secondarySponsors; track s.role) {
+            <div class="entourage__block entourage__block--full">
+              <p class="entourage__role">{{ s.role }}</p>
+              <img class="entourage__flourish" src="images/flourish.svg" alt="" aria-hidden="true" />
+              <div class="entourage__names">
                 @for (name of s.pair.split(' & '); track name) {
                   <p class="entourage__name">{{ name }}</p>
                 }
               </div>
-            }
-          </div>
+            </div>
+          }
 
-          <div class="entourage__cols entourage__cols--bearers">
-            @for (b of wedding.entourage.bearers; track b.role) {
-              <div class="entourage__block">
-                <p class="entourage__role">{{ b.role }}</p>
-                <img class="entourage__flourish" src="images/flourish.svg" alt="" aria-hidden="true" />
-                <p class="entourage__name">{{ b.name }}</p>
-              </div>
-            }
+          <div class="entourage__block entourage__block--full">
+            <p class="entourage__role">Bearers</p>
+            <img class="entourage__flourish" src="images/flourish.svg" alt="" aria-hidden="true" />
+            <div class="entourage__names entourage__names--bearers">
+              @for (b of wedding.entourage.bearers; track b.role) {
+                <div class="entourage__bearer">
+                  <span class="entourage__subrole">{{ b.role }}</span>
+                  <p class="entourage__name">{{ b.name }}</p>
+                </div>
+              }
+            </div>
           </div>
 
           @if (wedding.entourage.flowerGirls.length) {
-            <div class="entourage__block entourage__block--full">
+            <div class="entourage__block entourage__block--full entourage__block--flower-girls">
               <p class="entourage__role">Flower Girl</p>
               <img class="entourage__flourish" src="images/flourish.svg" alt="" aria-hidden="true" />
-              <div class="entourage__sponsors">
+              <div class="entourage__names">
                 @for (name of wedding.entourage.flowerGirls; track name) {
                   <p class="entourage__name">{{ name }}</p>
                 }
