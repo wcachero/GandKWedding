@@ -1409,84 +1409,83 @@
       inset 0 0 0 4.5px rgba(195, 164, 107, 0.7),
       0 14px 32px rgba(94, 70, 53, 0.1);
 
-    > * + * {
-      margin-top: 0.35rem;
+    /* Even rhythm between groups, with a soft gold hairline separating them. */
+    > * {
+      padding-block: clamp(1rem, 2.8vw, 1.4rem);
     }
+
+    > * + * {
+      background: linear-gradient(90deg, transparent, rgba(195, 164, 107, 0.5), transparent) top center / 55% 1px no-repeat;
+    }
+
+    > :first-child { padding-top: 0; }
+    > :last-child { padding-bottom: 0; }
   }
 
   &__cols {
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: clamp(0.5rem, 2vw, 1.5rem);
+    row-gap: 0;
     margin: 0;
-    padding: 0;
     align-items: start;
 
     .entourage__block {
-      margin: 0;
-      padding: 0 0 2.15rem;
-    }
-
-    .entourage__block + .entourage__block {
-      margin-top: 0.35rem;
+      padding: 0;
     }
 
     .entourage__name {
-      font-size: clamp(1.15rem, 1rem + 0.55vw, 1.45rem);
+      white-space: nowrap;
     }
+  }
+
+  /* Full-width groups (sponsors, bearers, etc.) read slightly smaller. */
+  &__block--full {
+    .entourage__role {
+      font-size: clamp(0.86rem, 0.78rem + 0.3vw, 1.04rem);
+    }
+
+    .entourage__name {
+      font-size: clamp(0.76rem, 0.68rem + 0.32vw, 0.98rem);
+    }
+  }
+
+  /* Side-by-side headings share one smaller size so they fit on one line. */
+  &__cols .entourage__role,
+  &__names--pair-roles .entourage__role {
+    letter-spacing: 0.02em;
+    font-size: clamp(0.72rem, 0.6rem + 0.45vw, 1rem);
+    white-space: nowrap;
   }
 
   &__block {
     min-width: 0;
     margin: 0;
-    padding: 0 0 2.15rem;
-
-    &--flower-girls .entourage__name:last-child {
-      margin-bottom: 0;
-    }
   }
 
   &__role {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.7rem;
     font-family: var(--font-heading);
     text-transform: uppercase;
     letter-spacing: 0.04em;
     font-size: clamp(0.98rem, 0.88rem + 0.32vw, 1.18rem);
     font-weight: 700;
-    color: #3f2a12;
-    margin: 0.15rem 0 0.55rem;
-    padding-top: 0.1rem;
-    padding-bottom: 0;
+    color: var(--color-accent);
+    margin: 0 0 0.6rem;
     line-height: 1.15;
-
-    &::before,
-    &::after {
-      content: "";
-      flex: 0 0 auto;
-      width: 1.35rem;
-      max-width: 1.35rem;
-      height: 1.5px;
-      border-radius: 1px;
-      background: #a67c52;
-    }
   }
 
   &__names {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     column-gap: clamp(0.25rem, 1.5vw, 1.25rem);
-    row-gap: 0.55rem;
+    row-gap: 0.3rem;
     width: 100%;
     margin-inline: auto;
     align-items: start;
 
     &--bearers {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       column-gap: clamp(0.5rem, 2vw, 1.25rem);
-      row-gap: 0.85rem;
+      row-gap: 0.9rem;
 
       /* Three bearers: two on the first row, the last one centered. */
       .entourage__bearer:last-child:nth-child(odd) {
@@ -1495,32 +1494,17 @@
     }
 
     &--pair-roles {
-      margin-bottom: 0.05rem;
-      column-gap: 0.65rem;
-
-      .entourage__role {
-        margin-bottom: 0.45rem;
-        gap: 0.3rem;
-        letter-spacing: 0.02em;
-        font-size: clamp(0.82rem, 2.2vw, 1.02rem);
-
-        &::before,
-        &::after {
-          flex: 0 0 auto;
-          width: 0.85rem;
-          max-width: 0.85rem;
-        }
-      }
+      column-gap: clamp(0.5rem, 2vw, 1.5rem);
     }
   }
 
   &__name {
     font-family: var(--font-body);
-    font-style: italic;
-    font-size: clamp(1.05rem, 0.95rem + 0.45vw, 1.35rem);
+    font-style: none;
+    font-size: clamp(0.82rem, 0.72rem + 0.4vw, 1.1rem);
     font-weight: 600;
     color: #3f2a1c;
-    line-height: 1.35;
+    line-height: 1.25;
     margin: 0;
     overflow-wrap: break-word;
   }
@@ -1528,27 +1512,23 @@
   &__bearer {
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: 0.15rem;
     min-width: 0;
   }
 
+  /* Small label under the main heading (Ring / Bible / Coin bearer). */
   &__subrole {
     font-family: var(--font-heading);
     text-transform: uppercase;
-    letter-spacing: 0.04em;
-    font-size: clamp(0.92rem, 0.84rem + 0.25vw, 1.08rem);
-    font-weight: 700;
-    color: #3f2a12;
+    letter-spacing: 0.08em;
+    font-size: clamp(0.7rem, 0.64rem + 0.2vw, 0.82rem);
+    font-weight: 600;
+    color: var(--color-accent-deep);
     line-height: 1.1;
-    margin-bottom: 0.3rem;
   }
 
   @media (max-width: 680px) {
     padding-block: clamp(2.5rem, 8vw, 4rem);
-
-    &__names--bearers .entourage__subrole {
-      font-size: clamp(0.84rem, 3.2vw, 1rem);
-    }
   }
 }
 
